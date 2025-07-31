@@ -13,7 +13,9 @@ demo-project-name/
 ├── Cargo.toml                 # Workspace root configuration
 ├── docs/                     # AI-assisted development documentation
 │   ├── specs/                # Feature specifications and requirements
+│   │   └── project-name/     # Project-specific specification documents
 │   └── plans/                # Implementation plans with discrete todos
+│   │   └── project-name/     # Project-specific implementation plans
 ├── training/
 │   ├── Cargo.toml            # Native training binary dependencies
 │   ├── src/
@@ -46,14 +48,15 @@ This project is designed to be developed extensively with Claude Code assistance
 
 The `docs/` folder contains two key subdirectories that support the AI-assisted development process:
 
-- **`docs/specs/`** - Feature specifications and requirements documents
-  - One file per feature (e.g., `user-authentication.md`, `model-optimization.md`)
+- **`docs/specs/project-name/`** - Project-specific specification documents
+  - Organized by project to support multiple AI projects in same template
+  - Complete specification suite: overview, technical requirements, testing, implementation guide
   - Clear problem statements, success criteria, and acceptance criteria
   - Technical constraints and architectural considerations
   
-- **`docs/plans/`** - Implementation plans with discrete todos
-  - Corresponds to specifications in `docs/specs/`
-  - Broken down into actionable, atomic tasks
+- **`docs/plans/project-name/`** - Project-specific implementation plans
+  - Corresponds to specifications in matching `docs/specs/project-name/` folder
+  - Broken down into actionable, atomic tasks with discrete todos
   - Dependencies and sequencing clearly defined
 
 ### Three-Phase Development Process
