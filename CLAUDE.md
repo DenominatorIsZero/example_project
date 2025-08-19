@@ -127,6 +127,10 @@ Commits should represent meaningful progress points, not arbitrary code changes:
 - **Logical Units** - Related changes grouped together (e.g., model definition + tests)
 - **Rollback Points** - States you could confidently return to if needed
 
+#### Commit Review Requirement
+
+**IMPORTANT**: Always ask the user to review changes before committing. Present a summary of what will be committed and wait for approval before executing any git commit commands.
+
 #### Commit Message Conventions
 
 Follow this format for AI workflow commits:
@@ -141,6 +145,8 @@ Follow this format for AI workflow commits:
 Closes: #issue-number (if applicable)
 Refs: docs/specs/feature-name.md, docs/plans/feature-name.md
 ```
+
+**IMPORTANT**: Do NOT include "Generated with Claude Code" footers or "Co-Authored-By: Claude" lines in commit messages. Use only the clean format shown above.
 
 Examples:
 ```

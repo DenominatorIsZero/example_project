@@ -1,0 +1,9 @@
+[workspace]
+members = ["training", "interactive", "shared"]
+resolver = "2"
+
+[workspace.dependencies]
+candle-core = "0.9"
+candle-nn = "0.9"
+anyhow = "1.0.99"
+serde = { version = "1.0", features = ["derive"] }

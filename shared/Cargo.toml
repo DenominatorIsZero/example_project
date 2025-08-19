@@ -1,0 +1,15 @@
+[package]
+name = "shared"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+candle-core = { workspace = true }
+candle-nn = { workspace = true }
+safetensors = "0.6"
+serde = { workspace = true }
+anyhow = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.0"
+approx = "0.5"

@@ -1,0 +1,18 @@
+[package]
+name = "interactive"
+version = "0.1.0"
+edition = "2024"
+
+
+[[bin]]
+name = "interactive"
+path = "src/main.rs"
+
+[dependencies]
+bevy = "0.16"
+candle-core = { workspace = true }
+wasm-bindgen = "0.2"
+web-sys = "0.3"
+console_error_panic_hook = "0.1"
+shared = { path = "../shared" }
+anyhow = { workspace = true }
