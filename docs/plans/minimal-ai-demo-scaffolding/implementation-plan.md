@@ -45,7 +45,7 @@ This plan transforms the [specifications](../../specs/minimal-ai-demo-scaffoldin
 **Commit Message**: `[IMPL] Set up Cargo workspace structure and placeholder crates`
 
 #### 1.2 Add Core Dependencies
-**Status**: Pending  
+**Status**: ✅ Completed  
 **Dependencies**: 1.1  
 **Definition of Done**:
 - All required dependencies added to appropriate crates
@@ -54,11 +54,11 @@ This plan transforms the [specifications](../../specs/minimal-ai-demo-scaffoldin
 - No version conflicts or dependency issues
 
 **Implementation Steps**:
-- [ ] Add shared dependencies in workspace `Cargo.toml`
-- [ ] Configure crate-specific dependencies for training binary
-- [ ] Configure crate-specific dependencies for interactive binary
-- [ ] Add WASM-specific features for interactive crate
-- [ ] Test compilation for all targets
+- [x] Add shared dependencies in workspace `Cargo.toml`
+- [x] Configure crate-specific dependencies for training binary
+- [x] Configure crate-specific dependencies for interactive binary
+- [x] Add WASM-specific features for interactive crate
+- [x] Test compilation for all targets
 
 **Dependencies to Add**:
 ```toml
@@ -72,15 +72,16 @@ serde = { version = "1.0", features = ["derive"] }
 safetensors = "0.4"
 
 # Interactive specific  
-bevy = { version = "0.14", default-features = false }
+bevy = "0.16"
 wasm-bindgen = "0.2"
 web-sys = "0.3"
+getrandom = { version = "0.3", features = ["wasm_js"] }
 ```
 
 **Commit Message**: `[IMPL] Add core dependencies and configure WASM features`
 
 #### 1.3 Verify Development Environment
-**Status**: Pending  
+**Status**: ✅ Completed  
 **Dependencies**: 1.2  
 **Definition of Done**:
 - Native compilation works for all crates
@@ -89,12 +90,14 @@ web-sys = "0.3"
 - Development environment documented
 
 **Implementation Steps**:
-- [ ] Test native builds: `cargo build --workspace`
-- [ ] Install WASM target: `rustup target add wasm32-unknown-unknown`
-- [ ] Install wasm-pack: `cargo install wasm-pack`
-- [ ] Test WASM compilation: `cd interactive && wasm-pack build --target web`
-- [ ] Configure rustfmt and clippy settings
-- [ ] Document environment setup in README
+- [x] Test native builds: `cargo build --workspace`
+- [x] Install WASM target: `rustup target add wasm32-unknown-unknown`
+- [x] Install wasm-server-runner: `cargo install wasm-server-runner`
+- [x] Create `.cargo/config.toml` with WASM runner configuration
+- [x] Test WASM compilation: `cargo build --target wasm32-unknown-unknown`
+- [x] Test WASM run: `cargo run --target wasm32-unknown-unknown --bin interactive`
+- [x] Create justfile for development task automation
+- [x] Document environment setup in README
 
 **Commit Message**: `[IMPL] Verify and document development environment setup`
 

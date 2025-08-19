@@ -160,18 +160,13 @@ fn run_inference(model: &DemoMLP, input1: f32, input2: f32) -> anyhow::Result<f3
 ```toml
 # interactive/Cargo.toml
 [dependencies]
-bevy = { version = "0.14", default-features = false, features = [
-    "bevy_ui", "bevy_text", "bevy_asset", "bevy_render", "bevy_core_pipeline"
-] }
+bevy = "0.16"
 candle-core = "0.6"
 wasm-bindgen = "0.2"
 web-sys = "0.3"
 shared = { path = "../shared" }
 
-[dependencies.bevy]
-# WASM-specific features
-default-features = false
-features = ["webgl2"]
+getrandom = { version = "0.3", features = ["wasm_js"] }
 
 [lib]
 crate-type = ["cdylib"]

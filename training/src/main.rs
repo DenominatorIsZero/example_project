@@ -6,6 +6,6 @@ use anyhow::Result;
 fn main() -> Result<()> {
     println!("AI Demo Training - Placeholder");
     println!("This will implement model training and saving.");
-    
+
     Ok(())
 }
