@@ -13,3 +13,4 @@ anyhow = { workspace = true }
 [dev-dependencies]
 tempfile = "3.0"
 approx = "0.5"
+serde_json = "1.0"

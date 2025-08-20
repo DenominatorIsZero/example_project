@@ -4325,6 +4325,7 @@ dependencies = [
  "candle-nn",
  "safetensors 0.6.0",
  "serde",
+ "serde_json",
  "tempfile",
 ]
 
