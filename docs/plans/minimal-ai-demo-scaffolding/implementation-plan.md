@@ -152,7 +152,7 @@ pub struct ModelMetadata {
 **Commit Message**: `[IMPL] Implement core data types and validation functions`
 
 #### 2.2 Implement Model Architecture
-**Status**: Pending  
+**Status**: ✅ Completed  
 **Dependencies**: 2.1  
 **Definition of Done**:
 - `DemoMLP` struct implemented with Candle layers
@@ -161,12 +161,12 @@ pub struct ModelMetadata {
 - Basic model tests pass
 
 **Implementation Steps**:
-- [ ] Create `shared/src/model.rs` with MLP definition
-- [ ] Implement `DemoMLP::new()` with VarBuilder pattern
-- [ ] Implement `DemoMLP::forward()` with proper activations
-- [ ] Add basic error handling and validation
-- [ ] Write tests for model creation and forward pass
-- [ ] Test with dummy input data
+- [x] Create `shared/src/model.rs` with MLP definition
+- [x] Implement `DemoMLP::new()` with VarBuilder pattern
+- [x] Implement `DemoMLP::forward()` with proper activations
+- [x] Add basic error handling and validation
+- [x] Write tests for model creation and forward pass
+- [x] Test with dummy input data
 
 **Model Implementation**:
 ```rust
