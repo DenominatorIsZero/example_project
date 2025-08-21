@@ -64,6 +64,7 @@ impl ModelMetadata {
 
 /// Simple Multi-Layer Perceptron for AI demo scaffolding
 /// Architecture is defined by the metadata parameter
+#[derive(Debug)]
 pub struct DemoMLP {
     pub fc1: Linear,
     pub fc2: Linear,
@@ -171,9 +172,8 @@ mod tests {
         for batch in output_vec {
             for value in batch {
                 assert!(
-                    value >= 0.0 && value <= 1.0,
-                    "Sigmoid output should be in [0,1], got {}",
-                    value
+                    (0.0..=1.0).contains(&value),
+                    "Sigmoid output should be in [0,1], got {value}"
                 );
             }
         }
@@ -223,7 +223,7 @@ mod tests {
 
         // The output should be a valid probability
         let output_value = output.to_vec2::<f32>()?[0][0];
-        assert!(output_value >= 0.0 && output_value <= 1.0);
+        assert!((0.0..=1.0).contains(&output_value));
 
         Ok(())
     }
@@ -256,9 +256,8 @@ mod tests {
         for batch in output_vec {
             for value in batch {
                 assert!(
-                    value >= 0.0 && value <= 1.0,
-                    "Sigmoid output should be in [0,1], got {}",
-                    value
+                    (0.0..=1.0).contains(&value),
+                    "Sigmoid output should be in [0,1], got {value}"
                 );
             }
         }

@@ -189,7 +189,7 @@ impl DemoMLP {
 **Commit Message**: `[IMPL] Implement DemoMLP model architecture with Candle`
 
 #### 2.3 Implement Model Persistence
-**Status**: Pending  
+**Status**: ✅ Completed  
 **Dependencies**: 2.2  
 **Definition of Done**:
 - Model save/load functions work with safetensors format
@@ -198,18 +198,20 @@ impl DemoMLP {
 - Model verification function extracts correct metadata
 
 **Implementation Steps**:
-- [ ] Create `shared/src/persistence.rs` with I/O functions
-- [ ] Implement `save_model()` with safetensors serialization
-- [ ] Implement `load_model()` with proper error handling
-- [ ] Implement `verify_model_file()` for metadata extraction
-- [ ] Add comprehensive error handling and validation
-- [ ] Write tests for save/load round-trips
+- [x] Create `shared/src/persistence.rs` with I/O functions
+- [x] Implement `save_model_from_varmap()` with safetensors serialization
+- [x] Implement `load_model()` with proper error handling
+- [x] Implement `verify_model_file()` for metadata extraction
+- [x] Add comprehensive error handling and validation
+- [x] Write tests for save/load round-trips
 
 **Key Functions**:
 ```rust
-pub fn save_model(model: &DemoMLP, path: &str) -> anyhow::Result<()>;
-pub fn load_model(path: &str, device: &Device) -> anyhow::Result<DemoMLP>;
+pub fn save_model_from_varmap(varmap: &VarMap, path: &str) -> anyhow::Result<()>;
+pub fn load_model(path: &str, metadata: ModelMetadata, device: &Device) -> anyhow::Result<DemoMLP>;
 pub fn verify_model_file(path: &str) -> anyhow::Result<ModelMetadata>;
+pub fn load_tensors(path: &str, device: &Device) -> anyhow::Result<HashMap<String, Tensor>>;
+pub fn save_tensors(tensors: HashMap<String, Tensor>, path: &str) -> anyhow::Result<()>;
 ```
 
 **Commit Message**: `[IMPL] Implement model persistence with safetensors format`
