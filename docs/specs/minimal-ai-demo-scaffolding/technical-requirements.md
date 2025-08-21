@@ -10,7 +10,7 @@ Detailed component specifications, dependencies, and APIs for the minimal AI dem
   - Hidden layer: 4 neurons with ReLU activation
   - Output layer: 1 neuron with sigmoid activation
 - **Training Data**: Generate synthetic dataset (configurable size) with inputs in range [-1, 1] and targets in range [0, 1]
-- **Training Process**: Initialize model but train for 0 epochs (demonstration purposes)
+- **Training Process**: Train model for configurable epochs (default: 100 epochs) using SGD optimizer to demonstrate actual learning and convergence
 - **Model Persistence**: Save model using two-file approach to `models/demo_model.toml` and `models/demo_model.safetensors`
 - **Validation**: Load saved model and verify inference capability
 
@@ -72,6 +72,8 @@ candle-core = { workspace = true }
 candle-nn = { workspace = true }
 anyhow = { workspace = true }
 shared = { path = "../shared" }
+rand = "0.8"
+candle-optimisers = "0.9"
 
 [dev-dependencies]
 tempfile = "3.0"

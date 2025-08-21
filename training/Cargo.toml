@@ -13,6 +13,7 @@ candle-nn = { workspace = true }
 anyhow = { workspace = true }
 shared = { path = "../shared" }
 rand = "0.8"
+candle-optimisers = "0.9"
 
 [dev-dependencies]
 tempfile = "3.0"
