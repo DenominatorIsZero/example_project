@@ -63,7 +63,33 @@ impl ModelMetadata {
 }
 
 /// Simple Multi-Layer Perceptron for AI demo scaffolding
-/// Architecture is defined by the metadata parameter
+///
+/// A basic neural network with configurable architecture consisting of:
+/// - Input layer (size defined by metadata)
+/// - Single hidden layer with ReLU activation (size defined by metadata)
+/// - Output layer with Sigmoid activation (size defined by metadata)
+///
+/// # Examples
+///
+/// ```rust
+/// use shared::{DemoMLP, ModelMetadata};
+/// use candle_core::Device;
+/// use candle_nn::{VarBuilder, VarMap};
+///
+/// # fn main() -> anyhow::Result<()> {
+/// let device = Device::Cpu;
+/// let varmap = VarMap::new();
+/// let vb = VarBuilder::from_varmap(&varmap, candle_core::DType::F32, &device);
+///
+/// // Create a model with custom architecture
+/// let input_size = 3;
+/// let output_size = 2;
+/// let hidden_size = 8;
+/// let metadata = ModelMetadata::new(input_size, output_size, hidden_size)?; // 3→8→2
+/// let model = DemoMLP::new(metadata, vb)?;
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Debug)]
 pub struct DemoMLP {
     pub fc1: Linear,
@@ -73,6 +99,32 @@ pub struct DemoMLP {
 
 impl DemoMLP {
     /// Create a new DemoMLP with the specified metadata and VarBuilder
+    ///
+    /// # Arguments
+    ///
+    /// * `metadata` - Architecture specification (input, hidden, output sizes)
+    /// * `vb` - VarBuilder for parameter initialization and management
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use shared::{DemoMLP, ModelMetadata};
+    /// use candle_core::Device;
+    /// use candle_nn::{VarBuilder, VarMap};
+    ///
+    /// # fn main() -> anyhow::Result<()> {
+    /// let device = Device::Cpu;
+    /// let varmap = VarMap::new();
+    /// let vb = VarBuilder::from_varmap(&varmap, candle_core::DType::F32, &device);
+    /// let input_size = 2;
+    /// let output_size = 1;
+    /// let hidden_size = 4;
+    /// let metadata = ModelMetadata::new(input_size, output_size, hidden_size)?;
+    ///
+    /// let model = DemoMLP::new(metadata, vb)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn new(metadata: ModelMetadata, vb: VarBuilder) -> Result<Self> {
         let fc1 = candle_nn::linear(metadata.input_size, metadata.hidden_size, vb.pp("fc1"))?;
         let fc2 = candle_nn::linear(metadata.hidden_size, metadata.output_size, vb.pp("fc2"))?;
@@ -82,13 +134,43 @@ impl DemoMLP {
 
     /// Create a DemoMLP with default demo architecture (2→4→1)
     pub fn new_demo(vb: VarBuilder) -> Result<Self> {
-        let metadata = ModelMetadata::new(2, 1, 4)?;
+        let input_size = 2;
+        let output_size = 1;
+        let hidden_size = 4;
+        let metadata = ModelMetadata::new(input_size, output_size, hidden_size)?;
         Self::new(metadata, vb)
     }
 
     /// Forward pass through the network
-    /// Input shape: [batch_size, input_size]
-    /// Output shape: [batch_size, output_size]
+    ///
+    /// Processes input through: input → fc1 → ReLU → fc2 → Sigmoid → output
+    ///
+    /// # Arguments
+    ///
+    /// * `input` - Input tensor with shape `[batch_size, input_size]`
+    ///
+    /// # Returns
+    ///
+    /// Output tensor with shape `[batch_size, output_size]` and values in range [0, 1]
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use shared::{DemoMLP, ModelMetadata};
+    /// use candle_core::{Device, Tensor};
+    /// use candle_nn::{VarBuilder, VarMap};
+    ///
+    /// # fn main() -> anyhow::Result<()> {
+    /// let device = Device::Cpu;
+    /// let varmap = VarMap::new();
+    /// let vb = VarBuilder::from_varmap(&varmap, candle_core::DType::F32, &device);
+    /// let model = DemoMLP::new_demo(vb)?;
+    ///
+    /// let input = Tensor::from_vec(vec![0.5f32, -0.3f32], (1, 2), &device)?;
+    /// let output = model.forward(&input)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn forward(&self, input: &Tensor) -> Result<Tensor> {
         // Validate input shape
         let input_shape = input.shape();
@@ -123,7 +205,10 @@ mod tests {
         let vb = VarBuilder::from_varmap(&varmap, candle_core::DType::F32, &device);
 
         // Test with custom metadata
-        let metadata = ModelMetadata::new(2, 1, 4)?;
+        let input_size = 2;
+        let output_size = 1;
+        let hidden_size = 4;
+        let metadata = ModelMetadata::new(input_size, output_size, hidden_size)?;
         let model = DemoMLP::new(metadata.clone(), vb)?;
 
         // Verify the model stores the metadata correctly
@@ -235,7 +320,10 @@ mod tests {
         let vb = VarBuilder::from_varmap(&varmap, candle_core::DType::F32, &device);
 
         // Test with different architecture (3 inputs, 8 hidden, 2 outputs)
-        let metadata = ModelMetadata::new(3, 2, 8)?;
+        let input_size = 3;
+        let output_size = 2;
+        let hidden_size = 8;
+        let metadata = ModelMetadata::new(input_size, output_size, hidden_size)?;
         let model = DemoMLP::new(metadata, vb)?;
 
         // Test with matching input
@@ -274,7 +362,10 @@ mod tests {
         assert!(ModelMetadata::new(20000, 1, 4).is_err()); // too large input_size
 
         // Valid metadata should work
-        let valid_metadata = ModelMetadata::new(3, 2, 8)?;
+        let input_size = 3;
+        let output_size = 2;
+        let hidden_size = 8;
+        let valid_metadata = ModelMetadata::new(input_size, output_size, hidden_size)?;
         assert_eq!(valid_metadata.input_size, 3);
         assert_eq!(valid_metadata.output_size, 2);
         assert_eq!(valid_metadata.hidden_size, 8);
@@ -284,7 +375,10 @@ mod tests {
 
     #[test]
     fn test_metadata_serialization() -> Result<()> {
-        let metadata = ModelMetadata::new(2, 1, 4)?;
+        let input_size = 2;
+        let output_size = 1;
+        let hidden_size = 4;
+        let metadata = ModelMetadata::new(input_size, output_size, hidden_size)?;
         let json = serde_json::to_string(&metadata)?;
         let deserialized: ModelMetadata = serde_json::from_str(&json)?;
         assert_eq!(metadata, deserialized);

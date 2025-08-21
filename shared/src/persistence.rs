@@ -10,6 +10,39 @@ use crate::model::{DemoMLP, ModelMetadata};
 /// This saves two files:
 /// - `{base_path}.toml` - model metadata in human-readable TOML format
 /// - `{base_path}.safetensors` - model weights in safetensors format
+///
+/// # Arguments
+///
+/// * `varmap` - VarMap containing the trained model parameters
+/// * `metadata` - Model architecture specification
+/// * `base_path` - File path prefix (without extension)
+///
+/// # Example
+///
+/// ```rust
+/// use shared::{save_model_from_varmap, ModelMetadata, DemoMLP};
+/// use candle_core::Device;
+/// use candle_nn::{VarBuilder, VarMap};
+///
+/// # fn main() -> anyhow::Result<()> {
+/// let device = Device::Cpu;
+/// let varmap = VarMap::new();
+/// let vb = VarBuilder::from_varmap(&varmap, candle_core::DType::F32, &device);
+/// let input_size = 2;
+/// let output_size = 1;
+/// let hidden_size = 4;
+/// let metadata = ModelMetadata::new(input_size, output_size, hidden_size)?;
+/// let _model = DemoMLP::new(metadata.clone(), vb)?;
+///
+/// // After training...
+/// # let temp_dir = tempfile::tempdir()?;
+/// # let model_path = temp_dir.path().join("trained_model");
+/// # let model_path_str = model_path.to_str().unwrap();
+/// save_model_from_varmap(&varmap, &metadata, model_path_str)?;
+/// // Creates: trained_model.toml and trained_model.safetensors
+/// # Ok(())
+/// # }
+/// ```
 pub fn save_model_from_varmap(
     varmap: &VarMap,
     metadata: &ModelMetadata,
@@ -37,6 +70,52 @@ pub fn save_model_from_varmap(
 /// This expects two files:
 /// - `{base_path}.toml` - model metadata
 /// - `{base_path}.safetensors` - model weights
+///
+/// The function automatically reads the metadata from the TOML file and uses it
+/// to reconstruct the model architecture, then loads the weights using memory-mapped
+/// safetensors for efficient loading.
+///
+/// # Arguments
+///
+/// * `base_path` - File path prefix (without extension)  
+/// * `device` - Device to load the model onto (CPU or CUDA)
+///
+/// # Returns
+///
+/// A fully reconstructed `DemoMLP` model ready for inference
+///
+/// # Example
+///
+/// ```rust
+/// use shared::{load_model, save_model_from_varmap, ModelMetadata, DemoMLP};
+/// use candle_core::{Device, Tensor};
+/// use candle_nn::{VarBuilder, VarMap};
+///
+/// # fn main() -> anyhow::Result<()> {
+/// let device = Device::Cpu;
+///
+/// // First create and save a model (normally done during training)
+/// let varmap = VarMap::new();
+/// let vb = VarBuilder::from_varmap(&varmap, candle_core::DType::F32, &device);
+/// let input_size = 2;
+/// let output_size = 1;
+/// let hidden_size = 4;
+/// let metadata = ModelMetadata::new(input_size, output_size, hidden_size)?;
+/// let _model = DemoMLP::new(metadata.clone(), vb)?;
+/// # let temp_dir = tempfile::tempdir()?;
+/// # let model_path = temp_dir.path().join("trained_model");
+/// # let model_path_str = model_path.to_str().unwrap();
+/// save_model_from_varmap(&varmap, &metadata, model_path_str)?;
+///
+/// // Load model (reads .toml and .safetensors files)
+/// let model = load_model(model_path_str, &device)?;
+///
+/// // Use for inference
+/// let input = Tensor::from_vec(vec![0.5f32, -0.3f32], (1, 2), &device)?;
+/// let output = model.forward(&input)?;
+/// # Ok(())
+/// # }
+/// ```
 pub fn load_model(base_path: &str, device: &Device) -> Result<DemoMLP> {
     let toml_path = format!("{base_path}.toml");
     let safetensors_path = format!("{base_path}.safetensors");
