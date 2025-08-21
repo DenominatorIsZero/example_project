@@ -126,85 +126,80 @@ _Estimated effort: 3-4 hours_
 
 #### 2.1 Implement Data Types and Structures
 
-**Status**: ✅ Completed  
+**Status**: ✅ Completed (Modified Approach)  
 **Dependencies**: 1.3  
 **Definition of Done**:
 
-- All data structures from specification implemented
+- Core data structures implemented (ModelMetadata in model.rs)
 - Types are properly serializable where needed
 - Basic validation functions work
 - Unit tests pass for data type functionality
 
 **Implementation Steps**:
 
-- [x] Create `shared/src/types.rs` with core data structures
-- [x] Implement `TrainingExample`, `PredictionInput`, `PredictionOutput`
-- [x] Add `ModelMetadata` structure
-- [x] Add serde derives where appropriate
-- [x] Write basic validation functions
-- [x] Add unit tests for data structures
+- [x] ~~Create `shared/src/types.rs` with core data structures~~ (Not needed)
+- [x] ~~Implement `TrainingExample`, `PredictionInput`, `PredictionOutput`~~ (Simple types used instead)
+- [x] Add `ModelMetadata` structure in model.rs with full validation
+- [x] Add serde derives for TOML serialization
+- [x] Write comprehensive validation functions with bounds checking
+- [x] Add extensive unit tests for data structures
 
-**Key Types to Implement**:
+**Actual Implementation**:
 
 ```rust
-pub struct TrainingExample {
-    pub input: [f32; 2],    // Range [-1, 1]
-    pub target: f32,        // Range [0, 1]
-}
-
-pub struct PredictionInput {
-    pub values: [f32; 2],
-}
-
-pub struct PredictionOutput {
-    pub value: f32,
-}
-
+// ModelMetadata embedded in model.rs (not separate types.rs)
 pub struct ModelMetadata {
-    pub input_size: usize,
-    pub output_size: usize,
-    pub hidden_size: usize,
+    pub input_size: usize,    // Validated: > 0, < 10,000
+    pub output_size: usize,   // Validated: > 0, < 10,000  
+    pub hidden_size: usize,   // Validated: > 0, < 10,000
 }
+
+// No formal TrainingExample/PredictionInput/Output structs
+// Simple types used: Vec<(Vec<f32>, f32)> for training data
+// Direct Tensor usage for model input/output
 ```
 
 **Commit Message**: `[IMPL] Implement core data types and validation functions`
 
 #### 2.2 Implement Model Architecture
 
-**Status**: ✅ Completed  
+**Status**: ✅ Completed (Enhanced)  
 **Dependencies**: 2.1  
 **Definition of Done**:
 
-- `DemoMLP` struct implemented with Candle layers
+- `DemoMLP` struct implemented with flexible, metadata-driven architecture
 - Model creation and forward pass methods work
-- Model can be instantiated and run inference
-- Basic model tests pass
+- Model can be instantiated with any architecture and run inference
+- Comprehensive model tests pass including validation
 
 **Implementation Steps**:
 
-- [x] Create `shared/src/model.rs` with MLP definition
-- [x] Implement `DemoMLP::new()` with VarBuilder pattern
-- [x] Implement `DemoMLP::forward()` with proper activations
-- [x] Add basic error handling and validation
-- [x] Write tests for model creation and forward pass
-- [x] Test with dummy input data
+- [x] Create `shared/src/model.rs` with flexible MLP definition
+- [x] Implement `DemoMLP::new(metadata, vb)` with VarBuilder pattern
+- [x] Add `DemoMLP::new_demo()` convenience constructor for 2→4→1 default
+- [x] Implement `DemoMLP::forward()` with ReLU→Sigmoid activations
+- [x] Add comprehensive error handling and input validation
+- [x] Write extensive tests for multiple architectures and edge cases
+- [x] Test with various input shapes and validate outputs
 
-**Model Implementation**:
+**Actual Implementation**:
 
 ```rust
 pub struct DemoMLP {
-    pub fc1: candle_nn::Linear,  // 2 → 4
-    pub fc2: candle_nn::Linear,  // 4 → 1
+    pub fc1: candle_nn::Linear,    // input_size → hidden_size
+    pub fc2: candle_nn::Linear,    // hidden_size → output_size
+    pub metadata: ModelMetadata,   // Architecture specification
 }
 
 impl DemoMLP {
-    pub fn new(vb: VarBuilder) -> anyhow::Result<Self> {
-        // Create linear layers with proper initialization
-    }
+    // Flexible constructor with any architecture
+    pub fn new(metadata: ModelMetadata, vb: VarBuilder) -> anyhow::Result<Self>;
+    
+    // Convenience constructor for default 2→4→1 demo
+    pub fn new_demo(vb: VarBuilder) -> anyhow::Result<Self>;
 
-    pub fn forward(&self, input: &Tensor) -> anyhow::Result<Tensor> {
-        // input → fc1 → ReLU → fc2 → Sigmoid
-    }
+    // Validated forward pass: input → fc1 → ReLU → fc2 → Sigmoid
+    pub fn forward(&self, input: &Tensor) -> anyhow::Result<Tensor>;
 }
 ```
 
@@ -212,54 +207,78 @@ impl DemoMLP {
 
 #### 2.3 Implement Model Persistence
 
-**Status**: ✅ Completed  
+**Status**: ✅ Completed (Two-File Approach)  
 **Dependencies**: 2.2  
 **Definition of Done**:
 
-- Model save/load functions work with safetensors format
-- Round-trip save/load preserves model weights
-- Error handling covers common failure cases
-- Model verification function extracts correct metadata
+- Model save/load functions work with two-file approach (.toml + .safetensors)
+- Round-trip save/load preserves model weights and metadata
+- Error handling covers common failure cases including file validation
+- Metadata is human-readable and automatically managed
 
 **Implementation Steps**:
 
-- [x] Create `shared/src/persistence.rs` with I/O functions
-- [x] Implement `save_model_from_varmap()` with safetensors serialization
-- [x] Implement `load_model()` with proper error handling
-- [x] Implement `verify_model_file()` for metadata extraction
-- [x] Add comprehensive error handling and validation
-- [x] Write tests for save/load round-trips
+- [x] Create `shared/src/persistence.rs` with two-file I/O functions
+- [x] Implement `save_model_from_varmap()` with TOML metadata + safetensors weights
+- [x] Implement `load_model()` with automatic metadata reading and validation
+- [x] Add comprehensive error handling for missing files and invalid data
+- [x] Write tests for save/load round-trips and error conditions
+- [x] Use memory-mapped safetensors for efficient loading
 
-**Key Functions**:
+**Actual Implementation**:
 
 ```rust
-pub fn save_model_from_varmap(varmap: &VarMap, path: &str) -> anyhow::Result<()>;
-pub fn load_model(path: &str, metadata: ModelMetadata, device: &Device) -> anyhow::Result<DemoMLP>;
-pub fn verify_model_file(path: &str) -> anyhow::Result<ModelMetadata>;
-pub fn load_tensors(path: &str, device: &Device) -> anyhow::Result<HashMap<String, Tensor>>;
-pub fn save_tensors(tensors: HashMap<String, Tensor>, path: &str) -> anyhow::Result<()>;
+// Two-file approach: base_path.toml + base_path.safetensors
+pub fn save_model_from_varmap(
+    varmap: &VarMap, 
+    metadata: &ModelMetadata, 
+    base_path: &str
+) -> anyhow::Result<()>;
+
+// Automatically reads metadata from .toml file
+pub fn load_model(base_path: &str, device: &Device) -> anyhow::Result<DemoMLP>;
+
+// Benefits:
+// - Human-readable metadata in .toml files
+// - Efficient binary weight storage  
+// - Memory-mapped loading for performance
+// - Clear separation of concerns
 ```
 
 **Commit Message**: `[IMPL] Implement model persistence with safetensors format`
 
 #### 2.4 Create Shared Library Public API
 
-**Status**: Pending  
+**Status**: ✅ Completed  
 **Dependencies**: 2.1, 2.2, 2.3  
 **Definition of Done**:
 
 - `shared/src/lib.rs` exports all public APIs cleanly
-- Documentation is complete for all public functions
-- API is easy to use from other crates
-- Integration tests demonstrate API usage
+- Documentation is complete for all public functions with examples
+- API is easy to use from other crates with minimal imports
+- Comprehensive integration tests demonstrate typical usage patterns
 
 **Implementation Steps**:
 
-- [x] Design clean public API in `lib.rs`
-- [x] Re-export key types and functions
-- [x] Add comprehensive documentation with examples
-- [x] Write integration tests showing typical usage patterns
-- [x] Test API from both training and interactive perspectives
+- [x] Design clean public API in `lib.rs` with re-exports
+- [x] Re-export key types and functions from model and persistence modules
+- [x] Re-export commonly used Candle types for convenience
+- [x] Add comprehensive documentation with working examples
+- [x] Write extensive integration tests showing training and inference workflows
+- [x] Test API ergonomics and ease of use
+
+**Actual Implementation**:
+
+```rust
+// Clean, minimal imports needed by users:
+// use shared::{DemoMLP, ModelMetadata, Device, VarBuilder, VarMap, save_model_from_varmap};
+
+pub use model::{DemoMLP, ModelMetadata};
+pub use persistence::{load_model, save_model_from_varmap};
+pub use candle_core::{DType, Device, Tensor};
+pub use candle_nn::{VarBuilder, VarMap};
+pub use anyhow::Result;
+```
 
 **Commit Message**: `[IMPL] Complete shared library with clean public API`
 
@@ -279,18 +298,32 @@ _Estimated effort: 2-3 hours_
 **Dependencies**: 2.4  
 **Definition of Done**:
 
-- Generates random training data in specified ranges
-- Data quality is suitable for demo purposes
+- Generates random training data in specified ranges (inputs [-1, 1], targets [0, 1])
+- Data works with existing `DemoMLP` architecture and `forward()` method
 - Generation is reproducible with seed option
-- Basic data validation passes
+- Basic data validation and logging implemented
 
 **Implementation Steps**:
 
+- [ ] Add `rand` dependency to training/Cargo.toml for random number generation
 - [ ] Create data generation function in `training/src/main.rs`
-- [ ] Generate inputs in range [-1, 1], targets in range [0, 1]
-- [ ] Add option for reproducible random seed
-- [ ] Implement basic data quality checks
-- [ ] Add logging for data generation statistics
+- [ ] Generate inputs as `Vec<[f32; 2]>` in range [-1, 1] using uniform distribution
+- [ ] Generate synthetic targets as `Vec<f32>` in range [0, 1] (using simple function)
+- [ ] Convert to Candle `Tensor` format for model compatibility
+- [ ] Add reproducible random seed option (default + configurable)
+- [ ] Implement basic data quality checks (range validation, NaN detection)
+- [ ] Add logging for generation statistics (count, input/target ranges)
+
+**Data Format Approach**:
+
+```rust
+// Simple approach using existing types (no TrainingExample struct)
+fn generate_training_data(size: usize, seed: Option<u64>) -> anyhow::Result<(Tensor, Tensor)> {
+    // Generate inputs: Vec<[f32; 2]> → Tensor shape [size, 2]
+    // Generate targets: Vec<f32> → Tensor shape [size, 1]  
+    // Return (input_tensor, target_tensor) ready for model.forward()
+}
+```
 
 **Commit Message**: `[IMPL] Implement synthetic training data generation`
 

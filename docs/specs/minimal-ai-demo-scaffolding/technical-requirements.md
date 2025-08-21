@@ -9,9 +9,9 @@ Detailed component specifications, dependencies, and APIs for the minimal AI dem
   - Input layer: 2 neurons
   - Hidden layer: 4 neurons with ReLU activation
   - Output layer: 1 neuron with sigmoid activation
-- **Training Data**: Generate synthetic dataset of 100 random samples in range [-1, 1]
+- **Training Data**: Generate synthetic dataset (configurable size) with inputs in range [-1, 1] and targets in range [0, 1]
 - **Training Process**: Initialize model but train for 0 epochs (demonstration purposes)
-- **Model Persistence**: Save model weights to `models/demo_model.safetensors`
+- **Model Persistence**: Save model using two-file approach to `models/demo_model.toml` and `models/demo_model.safetensors`
 - **Validation**: Load saved model and verify inference capability
 
 ### Technical Specifications
@@ -20,30 +20,9 @@ Detailed component specifications, dependencies, and APIs for the minimal AI dem
 ```rust
 // shared/src/model.rs
 pub struct DemoMLP {
-    fc1: candle_nn::Linear,  // 2 → 4
-    fc2: candle_nn::Linear,  // 4 → 1
-}
-
-impl DemoMLP {
-    pub fn new(vb: VarBuilder) -> anyhow::Result<Self>;
-    pub fn forward(&self, input: &Tensor) -> anyhow::Result<Tensor>;
-}
-```
-
-#### Data Format
-```rust
-// shared/src/types.rs
-pub struct TrainingExample {
-    pub input: [f32; 2],    // Values in range [-1, 1]
-    pub target: f32,        // Values in range [0, 1] (sigmoid output)
-}
-
-pub struct PredictionInput {
-    pub values: [f32; 2],
-}
-
-pub struct PredictionOutput {
-    pub value: f32,
+    pub fc1: candle_nn::Linear,  // input_size → hidden_size
+    pub fc2: candle_nn::Linear,  // hidden_size → output_size
+    pub metadata: ModelMetadata,
 }
 
 pub struct ModelMetadata {
@@ -51,15 +30,47 @@ pub struct ModelMetadata {
     pub output_size: usize,
     pub hidden_size: usize,
 }
+
+impl DemoMLP {
+    pub fn new(metadata: ModelMetadata, vb: VarBuilder) -> anyhow::Result<Self>;
+    pub fn new_demo(vb: VarBuilder) -> anyhow::Result<Self>;  // Creates 2→4→1 default
+    pub fn forward(&self, input: &Tensor) -> anyhow::Result<Tensor>;
+}
+
+impl ModelMetadata {
+    pub fn new(input_size: usize, output_size: usize, hidden_size: usize) -> anyhow::Result<Self>;
+    pub fn validate(&self) -> anyhow::Result<()>;
+}
+```
+
+#### Data Format
+```rust
+// Note: No separate types.rs module - data structures are embedded in relevant modules
+// Training data can be represented as simple tuples or vectors:
+
+// For training (example approaches):
+type TrainingData = Vec<(Vec<f32>, Vec<f32>)>;  // (inputs, targets)
+// OR
+struct TrainingBatch {
+    inputs: Tensor,   // Shape: [batch_size, input_size]
+    targets: Tensor,  // Shape: [batch_size, output_size]
+}
+
+// ModelMetadata is defined in model.rs and serialized to .toml files
+pub struct ModelMetadata {
+    pub input_size: usize,    // With validation (> 0, < 10,000)
+    pub output_size: usize,   // With validation (> 0, < 10,000)  
+    pub hidden_size: usize,   // With validation (> 0, < 10,000)
+}
 ```
 
 ### Dependencies
 ```toml
 # training/Cargo.toml
 [dependencies]
-candle-core = "0.6"
-candle-nn = "0.6"
-anyhow = "1.0"
+candle-core = { workspace = true }
+candle-nn = { workspace = true }
+anyhow = { workspace = true }
 shared = { path = "../shared" }
 
 [dev-dependencies]
@@ -202,81 +213,119 @@ cd interactive/pkg && python -m http.server 8000
 - **Data Types**: Shared input/output formats
 - **Model Persistence**: Model saving/loading functionality
 
-### Module Organization
+### Actual Module Organization
 
-#### model.rs - Model Architecture
+#### model.rs - Flexible Model Architecture
 ```rust
 pub struct DemoMLP {
-    pub fc1: candle_nn::Linear,  // 2 → 4
-    pub fc2: candle_nn::Linear,  // 4 → 1
+    pub fc1: candle_nn::Linear,    // input_size → hidden_size
+    pub fc2: candle_nn::Linear,    // hidden_size → output_size  
+    pub metadata: ModelMetadata,   // Architecture specification
+}
+
+pub struct ModelMetadata {
+    pub input_size: usize,   // Validated: > 0, < 10,000
+    pub output_size: usize,  // Validated: > 0, < 10,000
+    pub hidden_size: usize,  // Validated: > 0, < 10,000
 }
 
 impl DemoMLP {
-    pub fn new(vb: VarBuilder) -> anyhow::Result<Self>;
+    // Create model with custom architecture
+    pub fn new(metadata: ModelMetadata, vb: VarBuilder) -> anyhow::Result<Self>;
+    
+    // Convenience constructor for default 2→4→1 demo architecture
+    pub fn new_demo(vb: VarBuilder) -> anyhow::Result<Self>;
+    
+    // Forward pass: input → fc1 → ReLU → fc2 → Sigmoid
     pub fn forward(&self, input: &Tensor) -> anyhow::Result<Tensor>;
 }
-```
 
-#### types.rs - Data Structures
-```rust
-use serde::{Serialize, Deserialize};
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PredictionInput {
-    pub values: [f32; 2],
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PredictionOutput {
-    pub value: f32,
-}
-
-#[derive(Debug, Clone)]
-pub struct ModelMetadata {
-    pub input_size: usize,
-    pub output_size: usize,
-    pub hidden_size: usize,
+impl ModelMetadata {
+    pub fn new(input_size: usize, output_size: usize, hidden_size: usize) -> anyhow::Result<Self>;
+    pub fn validate(&self) -> anyhow::Result<()>;
 }
 ```
 
-#### persistence.rs - Model I/O
+#### No separate types.rs module
 ```rust
-pub fn save_model(model: &DemoMLP, path: &str) -> anyhow::Result<()>;
-pub fn load_model(path: &str, device: &Device) -> anyhow::Result<DemoMLP>;  
-pub fn verify_model_file(path: &str) -> anyhow::Result<ModelMetadata>;
+// Data structures are embedded in their relevant modules:
+// - ModelMetadata is in model.rs and handles serialization via serde
+// - Training data is handled as simple Rust types (Vec, Tensor)
+// - No formal PredictionInput/Output structs - direct Tensor usage
 
-// Pseudo code for save_model workflow:
-// 1. Extract tensor data from model.fc1 and model.fc2
-// 2. Create HashMap with tensor names ("fc1.weight", "fc1.bias", etc.)
-// 3. Serialize to safetensors format with proper metadata
-// 4. Write to file with error context
+// For training data generation, simple approaches work well:
+type TrainingData = Vec<(Vec<f32>, f32)>;  // (inputs, target)
 
-// Pseudo code for load_model workflow:
-// 1. Read file and validate it exists/is readable
-// 2. Deserialize safetensors format
-// 3. Extract tensors by expected names and validate shapes
-// 4. Create VarMap and reconstruct DemoMLP with loaded weights
+// For model I/O, Tensors are used directly:
+// Input: Tensor with shape [batch_size, input_size]  
+// Output: Tensor with shape [batch_size, output_size]
 
-// Pseudo code for verify_model_file workflow:
-// 1. Load safetensors header without loading full tensor data
-// 2. Check required tensor names exist
-// 3. Validate tensor shapes match expected architecture
-// 4. Return ModelMetadata with extracted information
+// ModelMetadata handles TOML serialization automatically:
+// File format: {base_path}.toml contains readable architecture info
+```
+
+#### persistence.rs - Two-File Model I/O
+```rust
+// Two-file approach: .toml metadata + .safetensors weights
+pub fn save_model_from_varmap(
+    varmap: &VarMap, 
+    metadata: &ModelMetadata, 
+    base_path: &str
+) -> anyhow::Result<()>;
+
+pub fn load_model(base_path: &str, device: &Device) -> anyhow::Result<DemoMLP>;
+
+// Implementation details:
+// save_model_from_varmap creates two files:
+// - {base_path}.toml - Human-readable metadata (input_size, output_size, hidden_size)
+// - {base_path}.safetensors - Efficient binary weight storage
+
+// load_model workflow:
+// 1. Read {base_path}.toml to get ModelMetadata
+// 2. Validate metadata with ModelMetadata::validate()
+// 3. Load weights from {base_path}.safetensors using memory-mapped safetensors
+// 4. Create VarBuilder from loaded weights
+// 5. Reconstruct DemoMLP with metadata and loaded weights
+
+// Benefits of two-file approach:
+// - Metadata is human-readable and easily inspectable
+// - Weights are efficiently stored and memory-mapped for fast loading
+// - Clear separation of concerns
+// - Easy to verify model architecture without loading full weights
+```
+
+### Public API Exports (lib.rs)
+```rust
+// Clean public API that re-exports everything users need
+pub use model::{DemoMLP, ModelMetadata};
+pub use persistence::{load_model, save_model_from_varmap};
+
+// Re-export commonly needed Candle types for convenience
+pub use candle_core::{DType, Device, Tensor};
+pub use candle_nn::{VarBuilder, VarMap};
+
+// Re-export Result type for convenience
+pub use anyhow::Result;
+
+// Usage example:
+// use shared::{DemoMLP, ModelMetadata, Device, VarBuilder, VarMap, save_model_from_varmap};
 ```
 
 ### Dependencies
 ```toml
 # shared/Cargo.toml
 [dependencies]
-candle-core = "0.6"
-candle-nn = "0.6"
-safetensors = "0.4"
-serde = { version = "1.0", features = ["derive"] }
-anyhow = "1.0"
+candle-core = { workspace = true }
+candle-nn = { workspace = true }
+safetensors = "0.6"
+serde = { workspace = true }
+anyhow = { workspace = true }
+toml = "0.9.5"
 
 [dev-dependencies]
 tempfile = "3.0"
 approx = "0.5"
+serde_json = "1.0"
 ```
 
 ### Success Criteria
