@@ -24,6 +24,10 @@ build-wasm:
 build-wasm-release:
     cargo build --target wasm32-unknown-unknown --bin interactive --release
 
+# Run interactive demo on native
+interactive:
+    cargo run --bin interactive
+
 # Run interactive demo with WASM development server
 demo:
     cargo run --target wasm32-unknown-unknown --bin interactive
