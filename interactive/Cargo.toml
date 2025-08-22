@@ -11,8 +11,7 @@ path = "src/main.rs"
 [dependencies]
 bevy = "0.16"
 candle-core = { workspace = true }
-wasm-bindgen = "0.2"
-web-sys = "0.3"
+candle-nn = { workspace = true }
 console_error_panic_hook = "0.1"
 # getrandom is pulled in by Bevy (for UUIDs) and Candle (for random number generation)
 # but neither enables the wasm_js feature required for WASM compilation.
@@ -20,3 +19,6 @@ console_error_panic_hook = "0.1"
 getrandom = { version = "0.3", features = ["wasm_js"] }
 shared = { path = "../shared" }
 anyhow = { workspace = true }
+serde = { workspace = true }
+toml = "0.8"
+safetensors = "0.4"
