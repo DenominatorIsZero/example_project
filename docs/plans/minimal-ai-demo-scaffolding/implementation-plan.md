@@ -207,45 +207,61 @@ impl DemoMLP {
 
 #### 2.3 Implement Model Persistence
 
-**Status**: ✅ Completed (Two-File Approach)  
+**Status**: ✅ Completed (Enhanced with WASM Support)  
 **Dependencies**: 2.2  
 **Definition of Done**:
 
-- Model save/load functions work with two-file approach (.toml + .safetensors)
-- Round-trip save/load preserves model weights and metadata
-- Error handling covers common failure cases including file validation
-- Metadata is human-readable and automatically managed
+- ✅ Model save/load functions work with two-file approach (.toml + .safetensors)
+- ✅ Round-trip save/load preserves model weights and metadata
+- ✅ Error handling covers common failure cases including file validation
+- ✅ Metadata is human-readable and automatically managed
+- ✅ **NEW**: WASM-compatible loading using memory-based approach
+- ✅ **NEW**: Layered API supports both file-based and data-based loading
 
 **Implementation Steps**:
 
 - [x] Create `shared/src/persistence.rs` with two-file I/O functions
 - [x] Implement `save_model_from_varmap()` with TOML metadata + safetensors weights
-- [x] Implement `load_model()` with automatic metadata reading and validation
+- [x] ~~Implement `load_model()` with automatic metadata reading and validation~~ **REPLACED**
+- [x] **NEW**: Implement `parse_model_metadata()` for TOML byte parsing
+- [x] **NEW**: Implement `load_model_from_data()` using `VarBuilder::from_slice_safetensors()` (WASM-compatible)
+- [x] **NEW**: Implement `load_model_from_files()` as convenience wrapper
 - [x] Add comprehensive error handling for missing files and invalid data
 - [x] Write tests for save/load round-trips and error conditions
-- [x] Use memory-mapped safetensors for efficient loading
+- [x] **NEW**: Add tests for memory-based loading approach
 
-**Actual Implementation**:
+**Enhanced Implementation**:
 
 ```rust
-// Two-file approach: base_path.toml + base_path.safetensors
+// Layered API supporting both file-based and memory-based loading
+pub fn parse_model_metadata(toml_bytes: &[u8]) -> anyhow::Result<ModelMetadata>;
+
+// WASM-compatible: loads from raw bytes without filesystem operations
+pub fn load_model_from_data(
+    toml_bytes: &[u8], 
+    safetensors_bytes: &[u8], 
+    device: &Device
+) -> anyhow::Result<DemoMLP>;
+
+// Native convenience: reads files then calls load_model_from_data()  
+pub fn load_model_from_files(base_path: &str, device: &Device) -> anyhow::Result<DemoMLP>;
+
+// Unchanged: two-file saving approach
 pub fn save_model_from_varmap(
     varmap: &VarMap,
     metadata: &ModelMetadata,
     base_path: &str
 ) -> anyhow::Result<()>;
-
-// Automatically reads metadata from .toml file
-pub fn load_model(base_path: &str, device: &Device) -> anyhow::Result<DemoMLP>;
-
-// Benefits:
-// - Human-readable metadata in .toml files
-// - Efficient binary weight storage
-// - Memory-mapped loading for performance
-// - Clear separation of concerns
 ```
 
-**Commit Message**: `[IMPL] Implement model persistence with safetensors format`
+**Key Benefits**:
+- ✅ **Universal compatibility**: Works in both native and WASM environments
+- ✅ **Clean separation**: File I/O separated from model creation logic
+- ✅ **Flexible usage**: Training uses file-based, Bevy uses memory-based
+- ✅ **No filesystem dependency**: Core loading logic doesn't require temp files
+- ✅ **Backward compatibility**: Existing save format unchanged
+
+**Commit Message**: `[IMPL] Enhance model persistence with WASM-compatible memory loading`
 
 #### 2.4 Create Shared Library Public API
 
@@ -274,7 +290,7 @@ pub fn load_model(base_path: &str, device: &Device) -> anyhow::Result<DemoMLP>;
 // use shared::{DemoMLP, ModelMetadata, Device, VarBuilder, VarMap, save_model_from_varmap};
 
 pub use model::{DemoMLP, ModelMetadata};
-pub use persistence::{load_model, save_model_from_varmap};
+pub use persistence::{load_model_from_files, load_model_from_data, parse_model_metadata, save_model_from_varmap};
 pub use candle_core::{DType, Device, Tensor};
 pub use candle_nn::{VarBuilder, VarMap};
 pub use anyhow::Result;
@@ -403,7 +419,7 @@ _Estimated effort: 4-5 hours_
 
 #### 4.2 Implement Model Loading System
 
-**Status**: Completed  
+**Status**: ✅ Completed (Enhanced with WASM Compatibility Fix)  
 **Dependencies**: 4.1  
 **Definition of Done**:
 
@@ -411,7 +427,7 @@ _Estimated effort: 4-5 hours_
 - ✅ Loading success/failure is tracked in app state (Loading → Ready/Error)
 - ✅ Error handling provides useful feedback
 - ✅ Model is stored as Bevy resource for other systems
-- ✅ Works identically on both native and WASM targets
+- ✅ **FIXED**: Works identically on both native and WASM targets
 
 **Implementation Steps**:
 
@@ -420,15 +436,33 @@ _Estimated effort: 4-5 hours_
 - ✅ Add model loading system with async asset loading
 - ✅ Add error handling for asset loading failures
 - ✅ Store loading status using Bevy state management
+- ✅ **FIXED**: Remove filesystem dependency for WASM compatibility
 - ✅ Test with both native and WASM targets
 
-**Technical Notes**:
-- Used Bevy's `embedded_asset!` macro for cross-platform compatibility
-- Custom `BinaryAssetLoader` handles both .toml and .safetensors files
-- Simplified model loading using temp file + `VarBuilder::from_mmaped_safetensors`
-- Eliminated complex HTTP/fetch code needed for WASM browser loading
+**Technical Implementation Evolution**:
 
-**Commit Message**: `[IMPL] Implement cross-platform model loading with embedded assets`
+1. **Initial approach** (worked on native, failed on WASM):
+   ```rust
+   // ❌ FAILED: Used temp files, doesn't work in WASM
+   let temp_file = std::env::temp_dir().join("embedded_model.safetensors");
+   std::fs::write(&temp_file, &safetensors_asset.data)?;
+   let vb = VarBuilder::from_mmaped_safetensors(&[&temp_file], ...)?;
+   ```
+
+2. **Enhanced approach** (works universally):
+   ```rust
+   // ✅ SUCCESS: Uses shared::load_model_from_data() - no filesystem needed
+   let device = Device::Cpu;
+   load_model_from_data(&toml_asset.data, &safetensors_asset.data, &device)
+   ```
+
+**Key Benefits**:
+- ✅ **WASM compatibility**: No "no filesystem on this platform" errors
+- ✅ **Code reuse**: Leverages shared persistence API consistently  
+- ✅ **Simplified logic**: 25 lines of temp file code → 3 lines of function call
+- ✅ **Better maintainability**: Single source of truth for model loading logic
+
+**Commit Message**: `[IMPL] Fix WASM model loading using memory-based persistence API`
 
 #### 4.3 Create Basic UI Layout
 

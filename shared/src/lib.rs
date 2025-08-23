@@ -39,7 +39,7 @@
 //! ### Loading and Using a Model
 //!
 //! ```rust
-//! use shared::{load_model, save_model_from_varmap, ModelMetadata, DemoMLP};
+//! use shared::{load_model_from_files, save_model_from_varmap, ModelMetadata, DemoMLP};
 //! use candle_core::{Device, Tensor};
 //! use candle_nn::{VarBuilder, VarMap};
 //!
@@ -60,7 +60,7 @@
 //! save_model_from_varmap(&varmap, &metadata, model_path_str)?;
 //!
 //! // Load model (automatically reads metadata from .toml file)
-//! let model = load_model(model_path_str, &device)?;
+//! let model = load_model_from_files(model_path_str, &device)?;
 //!
 //! // Run inference
 //! let input = Tensor::from_vec(vec![0.5f32, -0.3f32], (1, 2), &device)?;
@@ -83,7 +83,7 @@ pub mod persistence;
 
 // Re-export core types and functions
 pub use model::{DemoMLP, ModelMetadata};
-pub use persistence::{load_model, save_model_from_varmap};
+pub use persistence::{load_model_from_files, load_model_from_data, parse_model_metadata, save_model_from_varmap};
 
 // Re-export commonly needed Candle types for user convenience
 pub use candle_core::{DType, Device, Tensor};

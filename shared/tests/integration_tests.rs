@@ -4,7 +4,7 @@
 //! is intuitive and complete for both training and inference workflows.
 
 use shared::{DemoMLP, Device, ModelMetadata, Result, Tensor, VarBuilder, VarMap};
-use shared::{load_model, save_model_from_varmap};
+use shared::{load_model_from_files, save_model_from_varmap};
 use tempfile::tempdir;
 
 /// Test the complete training workflow: create model → train → save
@@ -70,7 +70,7 @@ fn test_inference_workflow() -> Result<()> {
     save_model_from_varmap(&varmap, &metadata, model_path_str)?;
 
     // Step 2: Load model for inference (this is what users typically do)
-    let inference_model = load_model(model_path_str, &device)?;
+    let inference_model = load_model_from_files(model_path_str, &device)?;
 
     // Step 3: Verify loaded model has correct metadata
     assert_eq!(inference_model.metadata.input_size, 2);
@@ -133,7 +133,7 @@ fn test_flexible_architectures() -> Result<()> {
         let model_path_str = model_path.to_str().unwrap();
 
         save_model_from_varmap(&varmap, &metadata, model_path_str)?;
-        let loaded_model = load_model(model_path_str, &device)?;
+        let loaded_model = load_model_from_files(model_path_str, &device)?;
 
         assert_eq!(loaded_model.metadata, metadata);
 
@@ -157,7 +157,7 @@ fn test_error_handling() -> Result<()> {
     assert!(ModelMetadata::new(20000, 1, 4).is_err()); // too large
 
     // Test loading nonexistent model
-    assert!(load_model("/nonexistent/model", &device).is_err());
+    assert!(load_model_from_files("/nonexistent/model", &device).is_err());
 
     // Test invalid input shapes
     let metadata = ModelMetadata::new(3, 1, 4)?;
@@ -202,7 +202,7 @@ fn test_demo_model() -> Result<()> {
     let model_path_str = model_path.to_str().unwrap();
 
     save_model_from_varmap(&varmap, &demo_model.metadata, model_path_str)?;
-    let loaded_demo = load_model(model_path_str, &device)?;
+    let loaded_demo = load_model_from_files(model_path_str, &device)?;
 
     assert_eq!(loaded_demo.metadata, demo_model.metadata);
 
@@ -233,10 +233,10 @@ fn test_api_ergonomics() -> Result<()> {
 
     // Inference scenario - minimal imports needed
     use shared::Tensor;
-    use shared::load_model;
+    use shared::load_model_from_files;
 
     // One-liner load
-    let model = load_model(model_path.to_str().unwrap(), &device)?;
+    let model = load_model_from_files(model_path.to_str().unwrap(), &device)?;
 
     // One-liner inference
     let input = Tensor::from_vec(vec![1.0f32, -1.0f32], (1, 2), &device)?;

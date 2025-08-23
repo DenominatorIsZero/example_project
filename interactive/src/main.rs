@@ -7,9 +7,8 @@ use bevy::{
     prelude::*,
     window::{WindowPlugin, WindowResolution},
 };
-use shared::{DemoMLP, Device, ModelMetadata};
-use candle_nn::VarBuilder;
-use anyhow::{Context, Result as AnyhowResult};
+use shared::{DemoMLP, Device, load_model_from_data};
+use anyhow::Result as AnyhowResult;
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
 enum AppState {
@@ -20,6 +19,7 @@ enum AppState {
 
 #[derive(Resource)]
 struct LoadedModel {
+    #[allow(dead_code)] // Model is stored but not currently used in demo
     model: DemoMLP,
 }
 
@@ -193,37 +193,17 @@ fn check_asset_loading(
     }
 }
 
-/// Load the model from the loaded binary assets  
+/// Load the model from the loaded binary assets using shared persistence functions
 fn load_model_from_assets(toml_asset: &BinaryAsset, safetensors_asset: &BinaryAsset) -> AnyhowResult<DemoMLP> {
-    // Parse TOML metadata from bytes
-    let toml_text = std::str::from_utf8(&toml_asset.data)
-        .context("Failed to convert TOML bytes to text")?;
-    let metadata: ModelMetadata = toml::from_str(toml_text)
-        .context("Failed to parse TOML metadata")?;
-    
-    info!("Loaded metadata: input_size={}, hidden_size={}, output_size={}", 
-          metadata.input_size, metadata.hidden_size, metadata.output_size);
-    
-    info!("Loaded safetensors data: {} bytes", safetensors_asset.data.len());
+    info!("Loading model from embedded assets...");
+    info!("TOML data: {} bytes", toml_asset.data.len());
+    info!("Safetensors data: {} bytes", safetensors_asset.data.len());
     
     // Create device  
     let device = Device::Cpu;
     
-    // Use the same approach as persistence.rs - write to temp file and use from_mmaped_safetensors
-    let temp_file = std::env::temp_dir().join("embedded_model.safetensors");
-    std::fs::write(&temp_file, &safetensors_asset.data)
-        .context("Failed to write temporary safetensors file")?;
-    
-    let vb = unsafe {
-        VarBuilder::from_mmaped_safetensors(&[&temp_file], candle_core::DType::F32, &device)
-            .context("Failed to create VarBuilder from temporary safetensors file")?
-    };
-    
-    // Clean up temp file
-    let _ = std::fs::remove_file(temp_file);
-    
-    // Create and return the model
-    DemoMLP::new(metadata, vb)
+    // Use the new WASM-compatible loading function from shared crate
+    load_model_from_data(&toml_asset.data, &safetensors_asset.data, &device)
 }
 
 /// System that runs when the application is ready

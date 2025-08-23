@@ -52,6 +52,32 @@ just --list
 - **Candle**: ML framework for model training and inference
 - **WebAssembly**: For browser deployment via `wasm-bindgen`
 
+## Model Persistence API
+
+The `shared` crate provides a flexible API for model saving and loading that works across both native and WASM environments:
+
+### Core Functions
+
+```rust
+// Parse TOML metadata from bytes
+let metadata = parse_model_metadata(toml_bytes)?;
+
+// Load model from raw bytes (WASM-compatible)
+let model = load_model_from_data(toml_bytes, safetensors_bytes, &device)?;
+
+// Load model from files (native convenience)  
+let model = load_model_from_files("path/to/model", &device)?;
+
+// Save trained model
+save_model_from_varmap(&varmap, &metadata, "path/to/model")?;
+```
+
+### Usage Patterns
+
+- **Training binary**: Uses `load_model_from_files()` for direct file access
+- **Interactive demo**: Uses `load_model_from_data()` with Bevy embedded assets
+- **Cross-platform**: Memory-based loading works in both native and WASM environments
+
 ## Development Environment
 
 This project is configured for optimal development with Claude Code assistance. The workspace uses modern Cargo features and is optimized for both native and WASM compilation.

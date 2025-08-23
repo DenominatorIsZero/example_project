@@ -266,41 +266,56 @@ type TrainingData = Vec<(Vec<f32>, f32)>;  // (inputs, target)
 // File format: {base_path}.toml contains readable architecture info
 ```
 
-#### persistence.rs - Two-File Model I/O
+#### persistence.rs - Enhanced Model I/O with WASM Support
 ```rust
-// Two-file approach: .toml metadata + .safetensors weights
+// Layered API supporting both file-based and memory-based loading
+pub fn parse_model_metadata(toml_bytes: &[u8]) -> anyhow::Result<ModelMetadata>;
+
+// WASM-compatible: loads from raw bytes without filesystem operations
+pub fn load_model_from_data(
+    toml_bytes: &[u8], 
+    safetensors_bytes: &[u8], 
+    device: &Device
+) -> anyhow::Result<DemoMLP>;
+
+// Native convenience: reads files then calls load_model_from_data()  
+pub fn load_model_from_files(base_path: &str, device: &Device) -> anyhow::Result<DemoMLP>;
+
+// Unchanged: two-file saving approach
 pub fn save_model_from_varmap(
     varmap: &VarMap, 
     metadata: &ModelMetadata, 
     base_path: &str
 ) -> anyhow::Result<()>;
 
-pub fn load_model(base_path: &str, device: &Device) -> anyhow::Result<DemoMLP>;
-
-// Implementation details:
+// Enhanced Implementation Details:
 // save_model_from_varmap creates two files:
-// - {base_path}.toml - Human-readable metadata (input_size, output_size, hidden_size)
+// - {base_path}.toml - Human-readable metadata (input_size, output_size, hidden_size)  
 // - {base_path}.safetensors - Efficient binary weight storage
 
-// load_model workflow:
-// 1. Read {base_path}.toml to get ModelMetadata
-// 2. Validate metadata with ModelMetadata::validate()
-// 3. Load weights from {base_path}.safetensors using memory-mapped safetensors
-// 4. Create VarBuilder from loaded weights
-// 5. Reconstruct DemoMLP with metadata and loaded weights
+// load_model_from_files workflow (native):
+// 1. Read {base_path}.toml and {base_path}.safetensors into memory
+// 2. Call load_model_from_data() with the byte arrays
 
-// Benefits of two-file approach:
-// - Metadata is human-readable and easily inspectable
-// - Weights are efficiently stored and memory-mapped for fast loading
-// - Clear separation of concerns
-// - Easy to verify model architecture without loading full weights
+// load_model_from_data workflow (universal):
+// 1. Parse TOML bytes to get ModelMetadata using parse_model_metadata()
+// 2. Validate metadata with ModelMetadata::validate()
+// 3. Load weights using VarBuilder::from_slice_safetensors() - no temp files!
+// 4. Reconstruct DemoMLP with metadata and loaded weights
+
+// Benefits of enhanced approach:
+// ✅ WASM compatibility: No filesystem operations in core loading logic
+// ✅ Clean separation: File I/O separated from model creation
+// ✅ Code reuse: Same loading logic for training (files) and interactive (assets)  
+// ✅ Flexibility: Supports both traditional file loading and embedded assets
+// ✅ Maintainability: Single source of truth for model loading logic
 ```
 
 ### Public API Exports (lib.rs)
 ```rust
 // Clean public API that re-exports everything users need
 pub use model::{DemoMLP, ModelMetadata};
-pub use persistence::{load_model, save_model_from_varmap};
+pub use persistence::{load_model_from_files, load_model_from_data, parse_model_metadata, save_model_from_varmap};
 
 // Re-export commonly needed Candle types for convenience
 pub use candle_core::{DType, Device, Tensor};
@@ -310,7 +325,7 @@ pub use candle_nn::{VarBuilder, VarMap};
 pub use anyhow::Result;
 
 // Usage example:
-// use shared::{DemoMLP, ModelMetadata, Device, VarBuilder, VarMap, save_model_from_varmap};
+// use shared::{DemoMLP, ModelMetadata, Device, VarBuilder, VarMap, load_model_from_files, save_model_from_varmap};
 ```
 
 ### Dependencies
