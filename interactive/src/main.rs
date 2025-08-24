@@ -19,6 +19,10 @@ pub const GRAY_SECONDARY: Color = Color::srgb(0.282, 0.282, 0.282); // gray-600:
 pub const YELLOW_ACCENT: Color = Color::srgb(0.918, 0.784, 0.157); // yellow-500: #eab308
 
 // UI Style Functions
+// Note: We use functions instead of constants because:
+// - Node::default() cannot be evaluated at compile time
+// - LazyLock + clone() approach is more verbose and no faster
+// - Simple functions are cleaner and more idiomatic for this use case
 fn main_container_style() -> Node {
     Node {
         width: Val::Percent(100.0),
@@ -427,7 +431,7 @@ fn check_asset_loading(
                         next_state.set(AppState::Ready);
                     }
                     Err(error) => {
-                        let error_message = format!("Failed to load model from assets: {}", error);
+                        let error_message = format!("Failed to load model from assets: {error}");
                         error!("{}", error_message);
                         commands.insert_resource(LoadingError {
                             message: error_message,
@@ -446,7 +450,6 @@ fn check_asset_loading(
                             message: error_message,
                         });
                         next_state.set(AppState::Error);
-                        return;
                     }
                 }
 
@@ -460,7 +463,6 @@ fn check_asset_loading(
                             message: error_message,
                         });
                         next_state.set(AppState::Error);
-                        return;
                     }
                 }
             }
@@ -504,18 +506,19 @@ fn update_ui_for_ready(mut query: Query<&mut Text, With<StatusDisplay>>) {
 /// Update UI when there's an error
 fn update_ui_for_error(mut query: Query<&mut Text, With<StatusDisplay>>, error: Res<LoadingError>) {
     for mut text in query.iter_mut() {
-        *text = Text::new(&format!("Model Status: Error - {}", error.message));
+        *text = Text::new(format!("Model Status: Error - {}", error.message));
     }
 }
 
 /// Handle button interactions with hover effects
-fn update_button_interactions(
-    mut query: Query<
-        (&Interaction, &mut BackgroundColor),
-        (Changed<Interaction>, With<PredictButton>),
-    >,
-) {
-    for (interaction, mut bg_color) in query.iter_mut() {
+type ButtonInteractionQuery<'w, 's> = Query<
+    'w, 's,
+    (&'static Interaction, &'static mut BackgroundColor),
+    (Changed<Interaction>, With<PredictButton>),
+>;
+
+fn update_button_interactions(mut button_query: ButtonInteractionQuery) {
+    for (interaction, mut bg_color) in button_query.iter_mut() {
         match *interaction {
             Interaction::Hovered => {
                 *bg_color = BackgroundColor(GREEN_HOVER);
