@@ -18,6 +18,93 @@ pub const GREEN_HOVER: Color = Color::srgb(0.251, 0.831, 0.412); // green-400: #
 pub const GRAY_SECONDARY: Color = Color::srgb(0.282, 0.282, 0.282); // gray-600: #484848
 pub const YELLOW_ACCENT: Color = Color::srgb(0.918, 0.784, 0.157); // yellow-500: #eab308
 
+// UI Style Functions
+fn main_container_style() -> Node {
+    Node {
+        width: Val::Percent(100.0),
+        height: Val::Percent(100.0),
+        justify_content: JustifyContent::Center,
+        align_items: AlignItems::Center,
+        ..default()
+    }
+}
+
+fn central_content_style() -> Node {
+    Node {
+        width: Val::Px(400.0),
+        height: Val::Px(500.0),
+        flex_direction: FlexDirection::Column,
+        justify_content: JustifyContent::SpaceEvenly,
+        align_items: AlignItems::Center,
+        padding: UiRect::all(Val::Px(20.0)),
+        border: UiRect::all(Val::Px(2.0)),
+        ..default()
+    }
+}
+
+fn input_section_style() -> Node {
+    Node {
+        width: Val::Percent(100.0),
+        flex_direction: FlexDirection::Column,
+        align_items: AlignItems::Center,
+        row_gap: Val::Px(10.0),
+        ..default()
+    }
+}
+
+fn input_row_style() -> Node {
+    Node {
+        width: Val::Percent(100.0),
+        flex_direction: FlexDirection::Row,
+        justify_content: JustifyContent::SpaceEvenly,
+        align_items: AlignItems::Center,
+        column_gap: Val::Px(20.0),
+        ..default()
+    }
+}
+
+fn input_field_container_style() -> Node {
+    Node {
+        flex_direction: FlexDirection::Column,
+        align_items: AlignItems::Center,
+        row_gap: Val::Px(5.0),
+        ..default()
+    }
+}
+
+fn input_field_style() -> Node {
+    Node {
+        width: Val::Px(80.0),
+        height: Val::Px(30.0),
+        border: UiRect::all(Val::Px(1.0)),
+        justify_content: JustifyContent::Center,
+        align_items: AlignItems::Center,
+        ..default()
+    }
+}
+
+fn button_style() -> Node {
+    Node {
+        width: Val::Px(120.0),
+        height: Val::Px(40.0),
+        justify_content: JustifyContent::Center,
+        align_items: AlignItems::Center,
+        margin: UiRect::vertical(Val::Px(10.0)),
+        border: UiRect::all(Val::Px(2.0)),
+        ..default()
+    }
+}
+
+fn output_section_style() -> Node {
+    Node {
+        width: Val::Percent(100.0),
+        flex_direction: FlexDirection::Column,
+        align_items: AlignItems::Center,
+        row_gap: Val::Px(8.0),
+        ..default()
+    }
+}
+
 // UI Component markers
 #[derive(Component)]
 pub struct MainContainer;
@@ -159,243 +246,143 @@ fn setup_application(mut commands: Commands) {
     info!("Basic Bevy application setup complete");
 }
 
+// UI Component Functions
+
+/// Spawn the central content box with all UI sections
+fn spawn_content_box(builder: &mut ChildSpawnerCommands) {
+    builder
+        .spawn((
+            central_content_style(),
+            BackgroundColor(GRAY_SECONDARY),
+            BorderColor(GREEN_PRIMARY),
+        ))
+        .with_children(|content| {
+            spawn_title(content);
+            spawn_status_display(content);
+            spawn_input_section(content);
+            spawn_output_section(content);
+        });
+}
+
+/// Spawn the title text
+fn spawn_title(builder: &mut ChildSpawnerCommands) {
+    builder.spawn((
+        Text::new("Minimal AI Demo"),
+        TextFont { font_size: 28.0, ..default() },
+        TextColor(TEXT_COLOR),
+        TitleText,
+    ));
+}
+
+/// Spawn the model status display
+fn spawn_status_display(builder: &mut ChildSpawnerCommands) {
+    builder.spawn((
+        Text::new("Model Status: Loading..."),
+        TextFont { font_size: 16.0, ..default() },
+        TextColor(TEXT_COLOR),
+        StatusDisplay,
+    ));
+}
+
+/// Spawn the input section (input row + predict button)
+fn spawn_input_section(builder: &mut ChildSpawnerCommands) {
+    builder.spawn((input_section_style(),)).with_children(|inputs| {
+        spawn_input_row(inputs);
+        spawn_predict_button(inputs);
+    });
+}
+
+/// Spawn the row containing both input fields
+fn spawn_input_row(builder: &mut ChildSpawnerCommands) {
+    builder.spawn((input_row_style(),)).with_children(|input_row| {
+        spawn_input_field(input_row, "Input 1:", 1);
+        spawn_input_field(input_row, "Input 2:", 2);
+    });
+}
+
+/// Spawn a single input field with label
+fn spawn_input_field(builder: &mut ChildSpawnerCommands, label: &str, field_id: usize) {
+    builder.spawn((input_field_container_style(),))
+        .with_children(|container| {
+            // Label
+            container.spawn((
+                Text::new(label),
+                TextFont { font_size: 14.0, ..default() },
+                TextColor(TEXT_COLOR),
+            ));
+            
+            // Input field
+            container.spawn((
+                input_field_style(),
+                BackgroundColor(Color::WHITE),
+                BorderColor(GRAY_SECONDARY),
+                InputField {
+                    field_id,
+                    placeholder: "0.0".to_string(),
+                },
+            ))
+            .with_children(|field| {
+                field.spawn((
+                    Text::new("0.0"),
+                    TextFont { font_size: 14.0, ..default() },
+                    TextColor(Color::BLACK),
+                ));
+            });
+        });
+}
+
+/// Spawn the predict button
+fn spawn_predict_button(builder: &mut ChildSpawnerCommands) {
+    builder.spawn((
+        Button,
+        button_style(),
+        BackgroundColor(GREEN_PRIMARY),
+        BorderColor(GREEN_PRIMARY),
+        PredictButton,
+    ))
+    .with_children(|button| {
+        button.spawn((
+            Text::new("Predict"),
+            TextFont { font_size: 16.0, ..default() },
+            TextColor(TEXT_COLOR),
+        ));
+    });
+}
+
+/// Spawn the output section with all result displays
+fn spawn_output_section(builder: &mut ChildSpawnerCommands) {
+    builder.spawn((output_section_style(),)).with_children(|output| {
+        output.spawn((
+            Text::new("Output: --"),
+            TextFont { font_size: 16.0, ..default() },
+            TextColor(TEXT_COLOR),
+            OutputDisplay,
+        ));
+        output.spawn((
+            Text::new("True Value: --"),
+            TextFont { font_size: 16.0, ..default() },
+            TextColor(TEXT_COLOR),
+        ));
+        output.spawn((
+            Text::new("Error: --"),
+            TextFont { font_size: 16.0, ..default() },
+            TextColor(TEXT_COLOR),
+        ));
+    });
+}
+
 /// Set up the main UI layout
 fn setup_ui(mut commands: Commands) {
     // Main container - full screen with dark background
     commands
         .spawn((
-            Node {
-                width: Val::Percent(100.0),
-                height: Val::Percent(100.0),
-                justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
-                ..default()
-            },
+            main_container_style(),
             BackgroundColor(BACKGROUND_COLOR),
             MainContainer,
         ))
-        .with_children(|parent| {
-            // Central content box
-            parent
-                .spawn((
-                    Node {
-                        width: Val::Px(400.0),
-                        height: Val::Px(500.0),
-                        flex_direction: FlexDirection::Column,
-                        justify_content: JustifyContent::SpaceEvenly,
-                        align_items: AlignItems::Center,
-                        padding: UiRect::all(Val::Px(20.0)),
-                        border: UiRect::all(Val::Px(2.0)),
-                        ..default()
-                    },
-                    BackgroundColor(GRAY_SECONDARY),
-                    BorderColor(GREEN_PRIMARY),
-                ))
-                .with_children(|content| {
-                    // Title
-                    content.spawn((
-                        Text::new("Minimal AI Demo"),
-                        TextFont {
-                            font_size: 28.0,
-                            ..default()
-                        },
-                        TextColor(TEXT_COLOR),
-                        TitleText,
-                    ));
-
-                    // Model Status
-                    content.spawn((
-                        Text::new("Model Status: Loading..."),
-                        TextFont {
-                            font_size: 16.0,
-                            ..default()
-                        },
-                        TextColor(TEXT_COLOR),
-                        StatusDisplay,
-                    ));
-
-                    // Input section
-                    content
-                        .spawn((Node {
-                            width: Val::Percent(100.0),
-                            flex_direction: FlexDirection::Column,
-                            align_items: AlignItems::Center,
-                            row_gap: Val::Px(10.0),
-                            ..default()
-                        },))
-                        .with_children(|inputs| {
-                            // Input row
-                            inputs
-                                .spawn((Node {
-                                    width: Val::Percent(100.0),
-                                    flex_direction: FlexDirection::Row,
-                                    justify_content: JustifyContent::SpaceEvenly,
-                                    align_items: AlignItems::Center,
-                                    column_gap: Val::Px(20.0),
-                                    ..default()
-                                },))
-                                .with_children(|input_row| {
-                                    // Input 1
-                                    input_row
-                                        .spawn((Node {
-                                            flex_direction: FlexDirection::Column,
-                                            align_items: AlignItems::Center,
-                                            row_gap: Val::Px(5.0),
-                                            ..default()
-                                        },))
-                                        .with_children(|input1| {
-                                            input1.spawn((
-                                                Text::new("Input 1:"),
-                                                TextFont {
-                                                    font_size: 14.0,
-                                                    ..default()
-                                                },
-                                                TextColor(TEXT_COLOR),
-                                            ));
-                                            input1
-                                                .spawn((
-                                                    Node {
-                                                        width: Val::Px(80.0),
-                                                        height: Val::Px(30.0),
-                                                        border: UiRect::all(Val::Px(1.0)),
-                                                        justify_content: JustifyContent::Center,
-                                                        align_items: AlignItems::Center,
-                                                        ..default()
-                                                    },
-                                                    BackgroundColor(Color::WHITE),
-                                                    BorderColor(GRAY_SECONDARY),
-                                                    InputField {
-                                                        field_id: 1,
-                                                        placeholder: "0.0".to_string(),
-                                                    },
-                                                ))
-                                                .with_children(|field| {
-                                                    field.spawn((
-                                                        Text::new("0.0"),
-                                                        TextFont {
-                                                            font_size: 14.0,
-                                                            ..default()
-                                                        },
-                                                        TextColor(Color::BLACK),
-                                                    ));
-                                                });
-                                        });
-
-                                    // Input 2
-                                    input_row
-                                        .spawn((Node {
-                                            flex_direction: FlexDirection::Column,
-                                            align_items: AlignItems::Center,
-                                            row_gap: Val::Px(5.0),
-                                            ..default()
-                                        },))
-                                        .with_children(|input2| {
-                                            input2.spawn((
-                                                Text::new("Input 2:"),
-                                                TextFont {
-                                                    font_size: 14.0,
-                                                    ..default()
-                                                },
-                                                TextColor(TEXT_COLOR),
-                                            ));
-                                            input2
-                                                .spawn((
-                                                    Node {
-                                                        width: Val::Px(80.0),
-                                                        height: Val::Px(30.0),
-                                                        border: UiRect::all(Val::Px(1.0)),
-                                                        justify_content: JustifyContent::Center,
-                                                        align_items: AlignItems::Center,
-                                                        ..default()
-                                                    },
-                                                    BackgroundColor(Color::WHITE),
-                                                    BorderColor(GRAY_SECONDARY),
-                                                    InputField {
-                                                        field_id: 2,
-                                                        placeholder: "0.0".to_string(),
-                                                    },
-                                                ))
-                                                .with_children(|field| {
-                                                    field.spawn((
-                                                        Text::new("0.0"),
-                                                        TextFont {
-                                                            font_size: 14.0,
-                                                            ..default()
-                                                        },
-                                                        TextColor(Color::BLACK),
-                                                    ));
-                                                });
-                                        });
-                                });
-
-                            // Predict Button
-                            inputs
-                                .spawn((
-                                    Button,
-                                    Node {
-                                        width: Val::Px(120.0),
-                                        height: Val::Px(40.0),
-                                        justify_content: JustifyContent::Center,
-                                        align_items: AlignItems::Center,
-                                        margin: UiRect::vertical(Val::Px(10.0)),
-                                        border: UiRect::all(Val::Px(2.0)),
-                                        ..default()
-                                    },
-                                    BackgroundColor(GREEN_PRIMARY),
-                                    BorderColor(GREEN_PRIMARY),
-                                    PredictButton,
-                                ))
-                                .with_children(|button| {
-                                    button.spawn((
-                                        Text::new("Predict"),
-                                        TextFont {
-                                            font_size: 16.0,
-                                            ..default()
-                                        },
-                                        TextColor(TEXT_COLOR),
-                                    ));
-                                });
-                        });
-
-                    // Output section
-                    content
-                        .spawn((Node {
-                            width: Val::Percent(100.0),
-                            flex_direction: FlexDirection::Column,
-                            align_items: AlignItems::Center,
-                            row_gap: Val::Px(8.0),
-                            ..default()
-                        },))
-                        .with_children(|output| {
-                            output.spawn((
-                                Text::new("Output: --"),
-                                TextFont {
-                                    font_size: 16.0,
-                                    ..default()
-                                },
-                                TextColor(TEXT_COLOR),
-                                OutputDisplay,
-                            ));
-                            output.spawn((
-                                Text::new("True Value: --"),
-                                TextFont {
-                                    font_size: 16.0,
-                                    ..default()
-                                },
-                                TextColor(TEXT_COLOR),
-                            ));
-                            output.spawn((
-                                Text::new("Error: --"),
-                                TextFont {
-                                    font_size: 16.0,
-                                    ..default()
-                                },
-                                TextColor(TEXT_COLOR),
-                            ));
-                        });
-                });
-        });
+        .with_children(spawn_content_box);
 }
+
 
 /// Start loading the embedded model assets
 fn start_loading_assets(mut commands: Commands, asset_server: Res<AssetServer>) {
