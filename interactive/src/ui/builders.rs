@@ -1,0 +1,141 @@
+// UI building and spawning functions
+
+use bevy::prelude::*;
+use super::{components::*, constants::*, styles::*};
+
+// UI Component Functions
+
+/// Spawn the central content box with all UI sections
+pub fn spawn_content_box(builder: &mut ChildSpawnerCommands) {
+    builder
+        .spawn((
+            central_content_style(),
+            BackgroundColor(GRAY_SECONDARY),
+            BorderColor(GREEN_PRIMARY),
+        ))
+        .with_children(|content| {
+            spawn_title(content);
+            spawn_status_display(content);
+            spawn_input_section(content);
+            spawn_output_section(content);
+        });
+}
+
+/// Spawn the title text
+pub fn spawn_title(builder: &mut ChildSpawnerCommands) {
+    builder.spawn((
+        Text::new("Minimal AI Demo"),
+        TextFont { font_size: 28.0, ..default() },
+        TextColor(TEXT_COLOR),
+        TitleText,
+    ));
+}
+
+/// Spawn the model status display
+pub fn spawn_status_display(builder: &mut ChildSpawnerCommands) {
+    builder.spawn((
+        Text::new("Model Status: Loading..."),
+        TextFont { font_size: 16.0, ..default() },
+        TextColor(TEXT_COLOR),
+        StatusDisplay,
+    ));
+}
+
+/// Spawn the input section (input row + predict button)
+pub fn spawn_input_section(builder: &mut ChildSpawnerCommands) {
+    builder.spawn((input_section_style(),)).with_children(|inputs| {
+        spawn_input_row(inputs);
+        spawn_predict_button(inputs);
+    });
+}
+
+/// Spawn the row containing both input fields
+pub fn spawn_input_row(builder: &mut ChildSpawnerCommands) {
+    builder.spawn((input_row_style(),)).with_children(|input_row| {
+        spawn_input_field(input_row, "Input 1:", 1);
+        spawn_input_field(input_row, "Input 2:", 2);
+    });
+}
+
+/// Spawn a single input field with label
+pub fn spawn_input_field(builder: &mut ChildSpawnerCommands, label: &str, field_id: usize) {
+    builder.spawn((input_field_container_style(),))
+        .with_children(|container| {
+            // Label
+            container.spawn((
+                Text::new(label),
+                TextFont { font_size: 14.0, ..default() },
+                TextColor(TEXT_COLOR),
+            ));
+            
+            // Input field
+            container.spawn((
+                input_field_style(),
+                BackgroundColor(Color::WHITE),
+                BorderColor(GRAY_SECONDARY),
+                InputField {
+                    field_id,
+                    placeholder: "0.0".to_string(),
+                },
+            ))
+            .with_children(|field| {
+                field.spawn((
+                    Text::new("0.0"),
+                    TextFont { font_size: 14.0, ..default() },
+                    TextColor(Color::BLACK),
+                ));
+            });
+        });
+}
+
+/// Spawn the predict button
+pub fn spawn_predict_button(builder: &mut ChildSpawnerCommands) {
+    builder.spawn((
+        Button,
+        button_style(),
+        BackgroundColor(GREEN_PRIMARY),
+        BorderColor(GREEN_PRIMARY),
+        PredictButton,
+    ))
+    .with_children(|button| {
+        button.spawn((
+            Text::new("Predict"),
+            TextFont { font_size: 16.0, ..default() },
+            TextColor(TEXT_COLOR),
+        ));
+    });
+}
+
+/// Spawn the output section with all result displays
+pub fn spawn_output_section(builder: &mut ChildSpawnerCommands) {
+    builder.spawn((output_section_style(),)).with_children(|output| {
+        output.spawn((
+            Text::new("Output: --"),
+            TextFont { font_size: 16.0, ..default() },
+            TextColor(TEXT_COLOR),
+            OutputDisplay,
+        ));
+        output.spawn((
+            Text::new("True Value: --"),
+            TextFont { font_size: 16.0, ..default() },
+            TextColor(TEXT_COLOR),
+        ));
+        output.spawn((
+            Text::new("Error: --"),
+            TextFont { font_size: 16.0, ..default() },
+            TextColor(TEXT_COLOR),
+        ));
+    });
+}
+
+/// Set up the main UI layout
+pub fn setup_ui(mut commands: Commands) {
+    // Main container - full screen with dark background
+    commands
+        .spawn((
+            main_container_style(),
+            BackgroundColor(BACKGROUND_COLOR),
+            MainContainer,
+        ))
+        .with_children(spawn_content_box);
+}
