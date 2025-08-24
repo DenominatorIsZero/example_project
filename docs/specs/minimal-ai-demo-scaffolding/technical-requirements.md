@@ -5,6 +5,7 @@ Detailed component specifications, dependencies, and APIs for the minimal AI dem
 ## 1. Training Binary (`training/`)
 
 ### Core Functionality
+
 - **Model Architecture**: Simple Multi-Layer Perceptron (MLP)
   - Input layer: 2 neurons
   - Hidden layer: 4 neurons with ReLU activation
@@ -17,6 +18,7 @@ Detailed component specifications, dependencies, and APIs for the minimal AI dem
 ### Technical Specifications
 
 #### Model Architecture
+
 ```rust
 // shared/src/model.rs
 pub struct DemoMLP {
@@ -44,6 +46,7 @@ impl ModelMetadata {
 ```
 
 #### Data Format
+
 ```rust
 // Note: No separate types.rs module - data structures are embedded in relevant modules
 // Training data can be represented as simple tuples or vectors:
@@ -59,12 +62,13 @@ struct TrainingBatch {
 // ModelMetadata is defined in model.rs and serialized to .toml files
 pub struct ModelMetadata {
     pub input_size: usize,    // With validation (> 0, < 10,000)
-    pub output_size: usize,   // With validation (> 0, < 10,000)  
+    pub output_size: usize,   // With validation (> 0, < 10,000)
     pub hidden_size: usize,   // With validation (> 0, < 10,000)
 }
 ```
 
 ### Dependencies
+
 ```toml
 # training/Cargo.toml
 [dependencies]
@@ -80,22 +84,25 @@ tempfile = "3.0"
 ```
 
 ### Success Criteria
+
 ✅ Binary compiles without errors  
 ✅ Generates random training data  
 ✅ Creates and initializes MLP model  
 ✅ Saves model to safetensors format  
 ✅ Loads model and performs test inference  
-✅ Outputs clear success/failure messages  
+✅ Outputs clear success/failure messages
 
 ## 2. Interactive Demo (`interactive/`)
 
 ### Core Functionality
+
 - **Model Loading**: Load `models/demo_model.safetensors` on startup
 - **User Interface**: Simple input/output interface
 - **Inference Pipeline**: Process user input through loaded model
 - **WASM Compilation**: Build for web deployment
 
 ### UI Layout
+
 ```
 ┌─────────────────────────────────┐
 │     Minimal AI Demo             │
@@ -107,12 +114,15 @@ tempfile = "3.0"
 │         [Predict]               │
 │                                 │
 │ Output: 0.7234                  │
+│ True Value: 0.7234              │
+│ Error: 0.0                      │
 └─────────────────────────────────┘
 ```
 
 ### Technical Specifications
 
 #### Application Architecture
+
 ```rust
 // interactive/src/main.rs - Key components and events
 #[derive(Component)]
@@ -145,6 +155,7 @@ fn update_ui_displays(/* ... update text displays with results ... */);
 ```
 
 #### Model Integration
+
 ```rust
 // Resource for loaded model
 #[derive(Resource)]
@@ -160,7 +171,7 @@ fn load_model_system() {
     // 4. Update model status component
 }
 
-// Pseudo code for inference workflow  
+// Pseudo code for inference workflow
 fn run_inference(model: &DemoMLP, input1: f32, input2: f32) -> anyhow::Result<f32> {
     // 1. Create tensor from inputs
     // 2. Run model.forward()
@@ -170,6 +181,7 @@ fn run_inference(model: &DemoMLP, input1: f32, input2: f32) -> anyhow::Result<f3
 ```
 
 ### Dependencies
+
 ```toml
 # interactive/Cargo.toml
 [dependencies]
@@ -186,12 +198,13 @@ crate-type = ["cdylib"]
 ```
 
 ### Build Process
+
 ```bash
 # Development build
 cd interactive
 wasm-pack build --target web --dev
 
-# Production build  
+# Production build
 cd interactive
 wasm-pack build --target web --release
 
@@ -200,17 +213,19 @@ cd interactive/pkg && python -m http.server 8000
 ```
 
 ### Success Criteria
+
 ✅ Binary compiles for native target  
 ✅ WASM compilation succeeds without errors  
 ✅ Loads model file and displays success status  
 ✅ UI renders correctly with input fields and button  
 ✅ User can input numbers and trigger prediction  
 ✅ Model inference produces output  
-✅ Demo runs in web browser  
+✅ Demo runs in web browser
 
 ## 3. Shared Library (`shared/`)
 
 ### Core Functionality
+
 - **Model Definition**: Common MLP structure used by both binaries
 - **Data Types**: Shared input/output formats
 - **Model Persistence**: Model saving/loading functionality
@@ -218,10 +233,11 @@ cd interactive/pkg && python -m http.server 8000
 ### Actual Module Organization
 
 #### model.rs - Flexible Model Architecture
+
 ```rust
 pub struct DemoMLP {
     pub fc1: candle_nn::Linear,    // input_size → hidden_size
-    pub fc2: candle_nn::Linear,    // hidden_size → output_size  
+    pub fc2: candle_nn::Linear,    // hidden_size → output_size
     pub metadata: ModelMetadata,   // Architecture specification
 }
 
@@ -234,10 +250,10 @@ pub struct ModelMetadata {
 impl DemoMLP {
     // Create model with custom architecture
     pub fn new(metadata: ModelMetadata, vb: VarBuilder) -> anyhow::Result<Self>;
-    
+
     // Convenience constructor for default 2→4→1 demo architecture
     pub fn new_demo(vb: VarBuilder) -> anyhow::Result<Self>;
-    
+
     // Forward pass: input → fc1 → ReLU → fc2 → Sigmoid
     pub fn forward(&self, input: &Tensor) -> anyhow::Result<Tensor>;
 }
@@ -249,6 +265,7 @@ impl ModelMetadata {
 ```
 
 #### No separate types.rs module
+
 ```rust
 // Data structures are embedded in their relevant modules:
 // - ModelMetadata is in model.rs and handles serialization via serde
@@ -259,7 +276,7 @@ impl ModelMetadata {
 type TrainingData = Vec<(Vec<f32>, f32)>;  // (inputs, target)
 
 // For model I/O, Tensors are used directly:
-// Input: Tensor with shape [batch_size, input_size]  
+// Input: Tensor with shape [batch_size, input_size]
 // Output: Tensor with shape [batch_size, output_size]
 
 // ModelMetadata handles TOML serialization automatically:
@@ -267,30 +284,31 @@ type TrainingData = Vec<(Vec<f32>, f32)>;  // (inputs, target)
 ```
 
 #### persistence.rs - Enhanced Model I/O with WASM Support
+
 ```rust
 // Layered API supporting both file-based and memory-based loading
 pub fn parse_model_metadata(toml_bytes: &[u8]) -> anyhow::Result<ModelMetadata>;
 
 // WASM-compatible: loads from raw bytes without filesystem operations
 pub fn load_model_from_data(
-    toml_bytes: &[u8], 
-    safetensors_bytes: &[u8], 
+    toml_bytes: &[u8],
+    safetensors_bytes: &[u8],
     device: &Device
 ) -> anyhow::Result<DemoMLP>;
 
-// Native convenience: reads files then calls load_model_from_data()  
+// Native convenience: reads files then calls load_model_from_data()
 pub fn load_model_from_files(base_path: &str, device: &Device) -> anyhow::Result<DemoMLP>;
 
 // Unchanged: two-file saving approach
 pub fn save_model_from_varmap(
-    varmap: &VarMap, 
-    metadata: &ModelMetadata, 
+    varmap: &VarMap,
+    metadata: &ModelMetadata,
     base_path: &str
 ) -> anyhow::Result<()>;
 
 // Enhanced Implementation Details:
 // save_model_from_varmap creates two files:
-// - {base_path}.toml - Human-readable metadata (input_size, output_size, hidden_size)  
+// - {base_path}.toml - Human-readable metadata (input_size, output_size, hidden_size)
 // - {base_path}.safetensors - Efficient binary weight storage
 
 // load_model_from_files workflow (native):
@@ -306,12 +324,13 @@ pub fn save_model_from_varmap(
 // Benefits of enhanced approach:
 // ✅ WASM compatibility: No filesystem operations in core loading logic
 // ✅ Clean separation: File I/O separated from model creation
-// ✅ Code reuse: Same loading logic for training (files) and interactive (assets)  
+// ✅ Code reuse: Same loading logic for training (files) and interactive (assets)
 // ✅ Flexibility: Supports both traditional file loading and embedded assets
 // ✅ Maintainability: Single source of truth for model loading logic
 ```
 
 ### Public API Exports (lib.rs)
+
 ```rust
 // Clean public API that re-exports everything users need
 pub use model::{DemoMLP, ModelMetadata};
@@ -329,6 +348,7 @@ pub use anyhow::Result;
 ```
 
 ### Dependencies
+
 ```toml
 # shared/Cargo.toml
 [dependencies]
@@ -346,15 +366,17 @@ serde_json = "1.0"
 ```
 
 ### Success Criteria
+
 ✅ Compiles as library crate  
 ✅ Model definition works in both training and interactive contexts  
 ✅ Data types are properly serializable  
 ✅ Persistence functions handle errors gracefully  
-✅ All public APIs are well-documented  
+✅ All public APIs are well-documented
 
 ## 4. Workspace Configuration
 
 ### Root Cargo.toml
+
 ```toml
 [workspace]
 members = ["training", "interactive", "shared"]
@@ -373,18 +395,21 @@ wee-alloc = true
 ## 5. Constraints and Considerations
 
 ### Technical Constraints
+
 - **Model Size**: Keep under 1MB for fast web loading
 - **WASM Compatibility**: All dependencies must support WASM compilation
 - **Browser Support**: Target modern browsers with WebAssembly support
 - **Build Time**: Keep compilation fast for development iteration
 
 ### Design Constraints
+
 - **Simplicity**: Avoid complex ML concepts or advanced Bevy features
 - **Documentation**: Every public function must have clear documentation
 - **Error Handling**: Fail gracefully with informative error messages
 - **Testability**: Structure code for easy unit testing
 
 ### Future Extensibility
+
 - **Model Architecture**: Easy to swap MLP for other architectures
 - **Data Format**: Generic enough for different input/output types
 - **UI Framework**: Bevy components can be extended for richer interfaces
@@ -393,12 +418,14 @@ wee-alloc = true
 ## 6. Validation Checklist
 
 ### Build Validation
+
 - [ ] `cargo check --workspace` passes without errors
 - [ ] `cargo build --workspace` compiles all binaries
 - [ ] `cargo build --release --workspace` creates optimized builds
 - [ ] WASM build: `cd interactive && wasm-pack build --target web --release`
 
 ### Functionality Validation
+
 - [ ] `cargo run --bin training` completes successfully
 - [ ] Model file is created in `models/` directory with reasonable size (>100 bytes, <10MB)
 - [ ] `cargo run --bin interactive` launches without errors
@@ -407,6 +434,7 @@ wee-alloc = true
 - [ ] All error conditions are handled gracefully
 
 ### Code Quality Validation
+
 - [ ] `cargo fmt --all -- --check` passes
 - [ ] `cargo clippy --workspace -- -D warnings` passes
 - [ ] All public APIs have documentation
