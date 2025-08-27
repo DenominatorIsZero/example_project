@@ -32,6 +32,11 @@ interactive:
 demo:
     cargo run --target wasm32-unknown-unknown --bin interactive
 
+# Run optimized WASM demo (size-optimized release build)
+demo-release:
+    cargo build --target wasm32-unknown-unknown --bin interactive --release
+    wasm-server-runner target/wasm32-unknown-unknown/release/interactive.wasm
+
 # Format all code
 fmt:
     cargo fmt --all
@@ -59,6 +64,7 @@ clean:
 install-deps:
     rustup target add wasm32-unknown-unknown
     cargo install wasm-server-runner
+    brew install binaryen
 
 # Full development setup from scratch
 setup: install-deps
