@@ -9,7 +9,7 @@ name = "interactive"
 path = "src/main.rs"
 
 [dependencies]
-bevy = "0.16"
+bevy = { version = "0.16", features = ["dynamic_linking"] }
 bevy_simple_text_input = "0.11"
 candle-core = { workspace = true }
 candle-nn = { workspace = true }
