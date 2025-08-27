@@ -33,8 +33,8 @@ pub fn central_content_style() -> (Node, BackgroundColor, BorderColor) {
             border: UiRect::all(Val::Px(2.0)),
             ..default()
         },
-        BackgroundColor(GRAY_SECONDARY),
-        BorderColor(GREEN_PRIMARY),
+        BackgroundColor(BACKGROUND_COLOR),
+        BorderColor(GRAY_SECONDARY),
     )
 }
 

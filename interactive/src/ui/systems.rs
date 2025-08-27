@@ -13,7 +13,7 @@ type ButtonInteractionQuery<'w, 's> = Query<
     'w,
     's,
     (&'static Interaction, &'static mut BackgroundColor),
-    (Changed<Interaction>, With<PredictButton>),
+    With<PredictButton>,
 >;
 
 /// Query for input1 styling updates
