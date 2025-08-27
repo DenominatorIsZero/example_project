@@ -13,7 +13,8 @@ use interactive::{
     start_loading_assets, check_asset_loading, on_ready_system, on_error_system,
     update_button_interactions, update_ui_for_ready, update_ui_for_error, 
     update_status_display, validate_numeric_inputs, update_input_styling,
-    sanitize_numeric_inputs, manage_input_focus, InputValues, ValidationState,
+    sanitize_numeric_inputs, manage_input_focus, process_prediction_requests,
+    update_output_displays, InputValues, ValidationState, PredictionRequest,
 };
 
 fn main() {
@@ -41,6 +42,7 @@ fn main() {
     
     app.add_plugins(EmbeddedAssetsPlugin)
         .add_plugins(TextInputPlugin)
+        .add_event::<PredictionRequest>()
         .insert_resource(InputValues::default())
         .insert_resource(ValidationState::default())
         .insert_state(AppState::Loading)
@@ -63,7 +65,9 @@ fn main() {
             sanitize_numeric_inputs,
             validate_numeric_inputs,
             update_input_styling,
-            update_button_interactions, 
+            update_button_interactions,
+            process_prediction_requests,
+            update_output_displays,
             update_status_display,
         ))
         .run();

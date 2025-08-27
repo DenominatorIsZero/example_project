@@ -576,35 +576,68 @@ pub struct ValidationState {
 
 #### 5.2 Implement Prediction System
 
-**Status**: Pending  
+**Status**: [x] Completed  
 **Dependencies**: 5.1  
 **Definition of Done**:
 
-- Predict button triggers inference when clicked
-- Inference runs using loaded model
-- Results are calculated correctly
-- System handles inference errors gracefully
+- [x] Predict button triggers inference when clicked
+- [x] Inference runs using loaded model
+- [x] Results are calculated correctly
+- [x] System handles inference errors gracefully
+- [x] Output displays update with prediction, true value, and error
+- [x] Event-driven architecture separates concerns cleanly
 
 **Implementation Steps**:
 
-- [ ] Create prediction event system for button clicks
-- [ ] Implement inference processing system
-- [ ] Add tensor creation from user inputs
-- [ ] Run model inference and extract results
-- [ ] Handle inference errors with user feedback
-- [ ] Test prediction accuracy and error cases
+- [x] Create prediction event system for button clicks
+- [x] Implement inference processing system
+- [x] Add tensor creation from user inputs
+- [x] Run model inference and extract results
+- [x] Handle inference errors with user feedback
+- [x] Create output component markers (TrueValueDisplay, ErrorDisplay)
+- [x] Implement output display update system
+- [x] Add PredictionResults resource for state management
+- [x] Test prediction accuracy and error cases
+
+**Technical Implementation**:
+
+```rust
+// Event-driven prediction system
+#[derive(Event)]
+pub struct PredictionRequest {
+    pub value1: f32,
+    pub value2: f32,
+}
+
+#[derive(Resource)]
+pub struct PredictionResults {
+    pub prediction: f32,
+    pub true_value: f32,
+    pub error: f32,
+}
+
+// Key systems:
+// - process_prediction_requests(): Handle events, run inference, compute results
+// - update_output_displays(): Update all three output text displays
+// - run_inference(): Tensor creation, model.forward(), true value calculation
+```
 
 **Event Flow**:
 
-1. User clicks predict button
+1. **User clicks predict button** → `PredictionRequest` event sent
+2. **System validates inputs** → Only proceeds if both values valid
+3. **Creates tensor from input values** → `[value1, value2]` → `Tensor[1,2]`
+4. **Runs model.forward()** → Gets prediction from neural network
+5. **Computes true value** → Using target function `(x1+x2).tanh()*0.5+0.5`
+6. **Calculates error** → Absolute difference between prediction and true value
+7. **Updates UI displays** → All three text displays show formatted results
 
-- [ ] System validates inputs
-- [ ] Creates tensor from input values
-- [ ] Runs model.forward()
-- [ ] Extracts and formats output
-- [ ] Updates UI display
+**Test Results Verified**:
+- Input: (1.0, 1.0) → Prediction: 0.957, True: 0.982, Error: 0.025
+- Clean query system without unnecessary `Without` filters
+- Error handling for inference failures with fallback values
 
-**Commit Message**: `[IMPL] Implement prediction system with model inference`
+**Commit Message**: `[IMPL] Implement prediction system with model inference and output displays`
 
 #### 5.3 Implement Output Display and UI Updates
 

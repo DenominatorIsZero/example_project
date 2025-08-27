@@ -163,6 +163,7 @@ pub fn spawn_output_section(builder: &mut ChildSpawnerCommands) {
                     ..default()
                 },
                 TextColor(TEXT_COLOR),
+                TrueValueDisplay,
             ));
             output.spawn((
                 Text::new("Error: --"),
@@ -171,6 +172,7 @@ pub fn spawn_output_section(builder: &mut ChildSpawnerCommands) {
                     ..default()
                 },
                 TextColor(TEXT_COLOR),
+                ErrorDisplay,
             ));
         });
 }

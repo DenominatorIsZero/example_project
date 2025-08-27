@@ -19,6 +19,12 @@ pub struct PredictButton;
 #[derive(Component)]
 pub struct OutputDisplay;
 
+#[derive(Component)]
+pub struct TrueValueDisplay;
+
+#[derive(Component)]
+pub struct ErrorDisplay;
+
 // Input field markers for text input system
 #[derive(Component)]
 pub struct Input1;
@@ -56,4 +62,19 @@ impl ValidationState {
     pub fn both_valid(&self) -> bool {
         self.input1_valid && self.input2_valid && !self.input1_empty && !self.input2_empty
     }
+}
+
+// Prediction system events and resources
+
+#[derive(Event)]
+pub struct PredictionRequest {
+    pub value1: f32,
+    pub value2: f32,
+}
+
+#[derive(Resource)]
+pub struct PredictionResults {
+    pub prediction: f32,
+    pub true_value: f32,
+    pub error: f32,
 }
