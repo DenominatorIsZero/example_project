@@ -1,9 +1,9 @@
 // UI interaction and update systems
 
 use super::{components::*, constants::*};
-use crate::app::AppState;
 use crate::model::{LoadedModel, LoadingError};
 use bevy::prelude::*;
+use bevy::ecs::system::ParamSet;
 use bevy_simple_text_input::{TextInput, TextInputInactive, TextInputValue};
 use candle_core::IndexOp;
 use shared::{Device, Tensor};
@@ -121,25 +121,6 @@ pub fn update_ui_for_error(
     }
 }
 
-/// Update status display based on current app state
-pub fn update_status_display(
-    mut query: Query<&mut Text, With<StatusDisplay>>,
-    current_state: Res<State<AppState>>,
-) {
-    for mut text in query.iter_mut() {
-        match current_state.get() {
-            AppState::Loading => {
-                *text = Text::new("Model Status: Loading...");
-            }
-            AppState::Ready => {
-                // Keep the "Loaded" text from update_ui_for_ready
-            }
-            AppState::Error => {
-                // Keep the error text from update_ui_for_error
-            }
-        }
-    }
-}
 
 /// Validate and parse numeric input from text input fields
 pub fn validate_numeric_inputs(
@@ -449,9 +430,11 @@ fn run_inference(
 
 /// Update output displays when prediction results change
 pub fn update_output_displays(
-    mut output_query: Query<&mut Text, With<OutputDisplay>>,
-    mut true_value_query: Query<&mut Text, With<TrueValueDisplay>>,
-    mut error_query: Query<&mut Text, With<ErrorDisplay>>,
+    mut queries: ParamSet<(
+        Query<&mut Text, With<OutputDisplay>>,
+        Query<&mut Text, With<TrueValueDisplay>>,
+        Query<&mut Text, With<ErrorDisplay>>,
+    )>,
     results: Option<Res<PredictionResults>>,
 ) {
     // Only update if we have results and they changed
@@ -463,17 +446,17 @@ pub fn update_output_displays(
     }
 
     // Update output display
-    if let Ok(mut text) = output_query.single_mut() {
+    if let Ok(mut text) = queries.p0().single_mut() {
         *text = Text::new(format!("Output: {:.3}", results.prediction));
     }
 
     // Update true value display
-    if let Ok(mut text) = true_value_query.single_mut() {
+    if let Ok(mut text) = queries.p1().single_mut() {
         *text = Text::new(format!("True Value: {:.3}", results.true_value));
     }
 
     // Update error display
-    if let Ok(mut text) = error_query.single_mut() {
+    if let Ok(mut text) = queries.p2().single_mut() {
         *text = Text::new(format!("Error: {:.3}", results.error));
     }
 }
