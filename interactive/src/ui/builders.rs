@@ -1,18 +1,18 @@
 // UI building and spawning functions
 
-use bevy::prelude::*;
 use super::{components::*, constants::*, styles::*};
+use bevy::prelude::*;
+use bevy_simple_text_input::{
+    TextInput, TextInputInactive, TextInputTextColor, TextInputTextFont,
+    TextInputValue,
+};
 
 // UI Component Functions
 
 /// Spawn the central content box with all UI sections
 pub fn spawn_content_box(builder: &mut ChildSpawnerCommands) {
     builder
-        .spawn((
-            central_content_style(),
-            BackgroundColor(GRAY_SECONDARY),
-            BorderColor(GREEN_PRIMARY),
-        ))
+        .spawn(central_content_style())
         .with_children(|content| {
             spawn_title(content);
             spawn_status_display(content);
@@ -25,7 +25,10 @@ pub fn spawn_content_box(builder: &mut ChildSpawnerCommands) {
 pub fn spawn_title(builder: &mut ChildSpawnerCommands) {
     builder.spawn((
         Text::new("Minimal AI Demo"),
-        TextFont { font_size: 28.0, ..default() },
+        TextFont {
+            font_size: 28.0,
+            ..default()
+        },
         TextColor(TEXT_COLOR),
         TitleText,
     ));
@@ -35,7 +38,10 @@ pub fn spawn_title(builder: &mut ChildSpawnerCommands) {
 pub fn spawn_status_display(builder: &mut ChildSpawnerCommands) {
     builder.spawn((
         Text::new("Model Status: Loading..."),
-        TextFont { font_size: 16.0, ..default() },
+        TextFont {
+            font_size: 16.0,
+            ..default()
+        },
         TextColor(TEXT_COLOR),
         StatusDisplay,
     ));
@@ -43,89 +49,130 @@ pub fn spawn_status_display(builder: &mut ChildSpawnerCommands) {
 
 /// Spawn the input section (input row + predict button)
 pub fn spawn_input_section(builder: &mut ChildSpawnerCommands) {
-    builder.spawn((input_section_style(),)).with_children(|inputs| {
-        spawn_input_row(inputs);
-        spawn_predict_button(inputs);
-    });
+    builder
+        .spawn((input_section_style(),))
+        .with_children(|inputs| {
+            spawn_input_row(inputs);
+            spawn_predict_button(inputs);
+        });
 }
 
 /// Spawn the row containing both input fields
 pub fn spawn_input_row(builder: &mut ChildSpawnerCommands) {
-    builder.spawn((input_row_style(),)).with_children(|input_row| {
-        spawn_input_field(input_row, "Input 1:", 1);
-        spawn_input_field(input_row, "Input 2:", 2);
-    });
+    builder
+        .spawn((input_row_style(),))
+        .with_children(|input_row| {
+            spawn_input_field(input_row, "Input 1:", 1);
+            spawn_input_field(input_row, "Input 2:", 2);
+        });
 }
 
 /// Spawn a single input field with label
 pub fn spawn_input_field(builder: &mut ChildSpawnerCommands, label: &str, field_id: usize) {
-    builder.spawn((input_field_container_style(),))
+    builder
+        .spawn((input_field_container_style(),))
         .with_children(|container| {
             // Label
             container.spawn((
                 Text::new(label),
-                TextFont { font_size: 14.0, ..default() },
+                TextFont {
+                    font_size: 14.0,
+                    ..default()
+                },
                 TextColor(TEXT_COLOR),
             ));
-            
-            // Input field
+
+            // Range indicator
             container.spawn((
-                input_field_style(),
-                BackgroundColor(Color::WHITE),
-                BorderColor(GRAY_SECONDARY),
-                InputField {
-                    field_id,
-                    placeholder: "0.0".to_string(),
+                Text::new("(-1.0 to 1.0)"),
+                TextFont {
+                    font_size: 12.0,
+                    ..default()
                 },
-            ))
-            .with_children(|field| {
-                field.spawn((
-                    Text::new("0.0"),
-                    TextFont { font_size: 14.0, ..default() },
-                    TextColor(Color::BLACK),
-                ));
-            });
+                TextColor(Color::srgb(0.6, 0.6, 0.6)), // Light gray for subtle hint
+            ));
+
+            // Interactive text input field
+            let mut input_entity = container.spawn((
+                TextInput,
+                Button, // Make it clickable
+                input_field_style(),
+                TextInputValue("".to_string()), // Start with empty string
+                TextInputTextFont(TextFont {
+                    font_size: 14.0,
+                    ..default()
+                }),
+                TextInputTextColor(TextColor(Color::BLACK)),
+            ));
+
+            // Add field-specific marker components
+            match field_id {
+                1 => {
+                    input_entity.insert(Input1);
+                    // Input1 starts active (focused)
+                    input_entity.insert(TextInputInactive(false)); // Active
+                }
+                2 => {
+                    input_entity.insert(Input2);
+                    // Input2 starts inactive (unfocused)
+                    input_entity.insert(TextInputInactive(true)); // Inactive
+                }
+                _ => {}
+            }
         });
 }
 
 /// Spawn the predict button
 pub fn spawn_predict_button(builder: &mut ChildSpawnerCommands) {
-    builder.spawn((
-        Button,
-        button_style(),
-        BackgroundColor(GREEN_PRIMARY),
-        BorderColor(GREEN_PRIMARY),
-        PredictButton,
-    ))
-    .with_children(|button| {
-        button.spawn((
-            Text::new("Predict"),
-            TextFont { font_size: 16.0, ..default() },
-            TextColor(TEXT_COLOR),
-        ));
-    });
+    builder
+        .spawn((
+            Button,
+            button_style(),
+            PredictButton,
+        ))
+        .with_children(|button| {
+            button.spawn((
+                Text::new("Predict"),
+                TextFont {
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(TEXT_COLOR),
+            ));
+        });
 }
 
 /// Spawn the output section with all result displays
 pub fn spawn_output_section(builder: &mut ChildSpawnerCommands) {
-    builder.spawn((output_section_style(),)).with_children(|output| {
-        output.spawn((
-            Text::new("Output: --"),
-            TextFont { font_size: 16.0, ..default() },
-            TextColor(TEXT_COLOR),
-            OutputDisplay,
-        ));
-        output.spawn((
-            Text::new("True Value: --"),
-            TextFont { font_size: 16.0, ..default() },
-            TextColor(TEXT_COLOR),
-        ));
-        output.spawn((
-            Text::new("Error: --"),
-            TextFont { font_size: 16.0, ..default() },
-            TextColor(TEXT_COLOR),
-        ));
-    });
+    builder
+        .spawn((output_section_style(),))
+        .with_children(|output| {
+            output.spawn((
+                Text::new("Output: --"),
+                TextFont {
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(TEXT_COLOR),
+                OutputDisplay,
+            ));
+            output.spawn((
+                Text::new("True Value: --"),
+                TextFont {
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(TEXT_COLOR),
+            ));
+            output.spawn((
+                Text::new("Error: --"),
+                TextFont {
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(TEXT_COLOR),
+            ));
+        });
 }
 
 /// Set up the main UI layout
@@ -134,7 +181,6 @@ pub fn setup_ui(mut commands: Commands) {
     commands
         .spawn((
             main_container_style(),
-            BackgroundColor(BACKGROUND_COLOR),
             MainContainer,
         ))
         .with_children(spawn_content_box);

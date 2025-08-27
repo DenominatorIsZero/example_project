@@ -11,4 +11,5 @@ pub use ui::setup_ui;
 pub use model::{EmbeddedAssetsPlugin, start_loading_assets, check_asset_loading, 
                 on_ready_system, on_error_system};
 pub use ui::{update_button_interactions, update_ui_for_ready, update_ui_for_error, 
-             update_status_display};
+             update_status_display, validate_numeric_inputs, update_input_styling,
+             sanitize_numeric_inputs, manage_input_focus, InputValues, ValidationState};

@@ -7,11 +7,13 @@ use bevy::{
     prelude::*,
     window::{WindowPlugin, WindowResolution},
 };
+use bevy_simple_text_input::TextInputPlugin;
 use interactive::{
     AppState, setup_application, setup_ui, EmbeddedAssetsPlugin,
     start_loading_assets, check_asset_loading, on_ready_system, on_error_system,
     update_button_interactions, update_ui_for_ready, update_ui_for_error, 
-    update_status_display,
+    update_status_display, validate_numeric_inputs, update_input_styling,
+    sanitize_numeric_inputs, manage_input_focus, InputValues, ValidationState,
 };
 
 fn main() {
@@ -38,6 +40,9 @@ fn main() {
     embedded_asset!(app, "models/demo_model.safetensors");
     
     app.add_plugins(EmbeddedAssetsPlugin)
+        .add_plugins(TextInputPlugin)
+        .insert_resource(InputValues::default())
+        .insert_resource(ValidationState::default())
         .insert_state(AppState::Loading)
         .add_systems(Startup, (setup_application, setup_ui))
         .add_systems(OnEnter(AppState::Loading), start_loading_assets)
@@ -53,6 +58,13 @@ fn main() {
             OnEnter(AppState::Error),
             (on_error_system, update_ui_for_error),
         )
-        .add_systems(Update, (update_button_interactions, update_status_display))
+        .add_systems(Update, (
+            manage_input_focus,
+            sanitize_numeric_inputs,
+            validate_numeric_inputs,
+            update_input_styling,
+            update_button_interactions, 
+            update_status_display,
+        ))
         .run();
 }
