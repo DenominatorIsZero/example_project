@@ -5,7 +5,7 @@ use bevy::{
     asset::embedded_asset,
     log::LogPlugin,
     prelude::*,
-    window::{WindowPlugin, WindowResolution},
+    window::WindowPlugin,
 };
 use bevy_simple_text_input::TextInputPlugin;
 use interactive::{
@@ -24,7 +24,7 @@ fn main() {
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         title: "AI Demo - Minimal Scaffolding".into(),
-                        resolution: WindowResolution::new(800.0, 600.0),
+                        fit_canvas_to_parent: true,
                         resizable: true,
                         ..default()
                     }),

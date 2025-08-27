@@ -24,8 +24,8 @@ pub fn main_container_style() -> (Node, BackgroundColor) {
 pub fn central_content_style() -> (Node, BackgroundColor, BorderColor) {
     (
         Node {
-            width: Val::Px(400.0),
-            height: Val::Px(500.0),
+            width: Val::Percent(100.0),
+            height: Val::Percent(100.0),
             flex_direction: FlexDirection::Column,
             justify_content: JustifyContent::SpaceEvenly,
             align_items: AlignItems::Center,
