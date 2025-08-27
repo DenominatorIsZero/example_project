@@ -1,1 +1,5 @@
 **/target/**
+
+# Generated web assets (can be rebuilt with `just build-web`)
+interactive/web/*.wasm
+interactive/web/*.js
