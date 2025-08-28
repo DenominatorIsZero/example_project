@@ -65,7 +65,7 @@ _Estimated effort: 2-3 hours_
 
 - [x] Verify `embedded_asset!` path requirements (relative to interactive/src/ directory)
 - [x] Establish correct model file locations for embedded assets
-- [x] Remove unnecessary duplicate files from incorrect locations  
+- [x] Remove unnecessary duplicate files from incorrect locations
 - [x] Update training binary to copy files to `interactive/src/models/` for embedded assets
 - [x] Update documentation to explain model file organization constraints
 - [x] Verify complete workflow: train → save to workspace → copy → embedded assets work
@@ -133,13 +133,13 @@ _Estimated effort: 3-4 hours_
 
 - [x] Create `docs/projects/archive/minimal-ai-demo-scaffolding/` directory structure
 - [x] Move current specs from `docs/specs/minimal-ai-demo-scaffolding/` to examples
-- [x] Move current plan from `docs/plans/minimal-ai-demo-scaffolding/` to examples  
+- [x] Move current plan from `docs/plans/minimal-ai-demo-scaffolding/` to examples
 - [x] Update any internal references to new locations
 - [x] Add README in examples directory explaining the reference implementation
 
 #### 2.3 Create Template Specifications and Plans
 
-**Status**: [ ] Pending  
+**Status**: [x] Completed  
 **Dependencies**: Task 2.2 (archived documentation)  
 **Definition of Done**:
 
@@ -149,12 +149,12 @@ _Estimated effort: 3-4 hours_
 
 **Implementation Steps**:
 
-- [ ] Create `docs/templates/ai-demo-template/` directory structure
-- [ ] Create generic project specification template based on completed example
-- [ ] Create generic implementation plan template with standard phases
-- [ ] Document the specification and planning methodology for AI demos
-- [ ] Include guidance on adapting templates for specific use cases
-- [ ] Add examples of how to fill in template sections for new projects
+- [x] Create `docs/projects/template/` directory structure
+- [x] Create generic project specification template based on completed example
+- [x] Create generic implementation plan template with standard phases
+- [x] Document the specification and planning methodology for AI demos
+- [x] Include guidance on adapting templates for specific use cases
+- [x] Add examples of how to fill in template sections for new projects
 
 ---
 
