@@ -1,9 +1,9 @@
 // Model loading logic and plugin
 
+use super::assets::{BinaryAsset, BinaryAssetLoader};
+use anyhow::Result as AnyhowResult;
 use bevy::prelude::*;
 use shared::{DemoMLP, Device, load_model_from_data};
-use anyhow::Result as AnyhowResult;
-use super::assets::{BinaryAsset, BinaryAssetLoader};
 
 pub struct EmbeddedAssetsPlugin;
 
@@ -14,7 +14,7 @@ impl Plugin for EmbeddedAssetsPlugin {
         // Register the binary asset loader (assets are embedded in main.rs)
         app.init_asset::<BinaryAsset>()
             .init_asset_loader::<BinaryAssetLoader>();
-        
+
         info!("EmbeddedAssetsPlugin: Plugin setup complete");
     }
 }

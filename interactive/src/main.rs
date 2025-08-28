@@ -1,45 +1,41 @@
 // Interactive demo binary for AI demo scaffolding
 // Bevy-based UI application for model inference demonstration
 
-use bevy::{
-    asset::embedded_asset,
-    log::LogPlugin,
-    prelude::*,
-    window::WindowPlugin,
-};
+use bevy::{asset::embedded_asset, log::LogPlugin, prelude::*, window::WindowPlugin};
 use bevy_simple_text_input::TextInputPlugin;
 use interactive::{
-    AppState, setup_application, setup_ui, EmbeddedAssetsPlugin,
-    start_loading_assets, check_asset_loading, on_ready_system, on_error_system,
-    update_button_interactions, update_ui_for_ready, update_ui_for_error, 
-    validate_numeric_inputs, update_input_styling,
-    sanitize_numeric_inputs, manage_input_focus, process_prediction_requests,
-    update_output_displays, InputValues, ValidationState, PredictionRequest,
+    AppState, EmbeddedAssetsPlugin, InputValues, PredictionRequest, ValidationState,
+    check_asset_loading, manage_input_focus, on_error_system, on_ready_system,
+    process_prediction_requests, sanitize_numeric_inputs, setup_application, setup_ui,
+    start_loading_assets, update_button_interactions, update_input_styling, update_output_displays,
+    update_ui_for_error, update_ui_for_ready, validate_numeric_inputs,
 };
 
 fn main() {
     let mut app = App::new();
-    
-    app.add_plugins(DefaultPlugins
-                .set(WindowPlugin {
-                    primary_window: Some(Window {
-                        title: "AI Demo - Minimal Scaffolding".into(),
-                        fit_canvas_to_parent: true,
-                        resizable: true,
-                        ..default()
-                    }),
+
+    app.add_plugins(
+        DefaultPlugins
+            .set(WindowPlugin {
+                primary_window: Some(Window {
+                    title: "AI Demo - Minimal Scaffolding".into(),
+                    fit_canvas_to_parent: true,
+                    resizable: true,
                     ..default()
-                })
-                .set(LogPlugin {
-                    level: bevy::log::Level::INFO,
-                    filter: "wgpu=error,bevy_render=info,bevy_ecs=warn".into(),
-                    ..default()
-                }));
-    
+                }),
+                ..default()
+            })
+            .set(LogPlugin {
+                level: bevy::log::Level::INFO,
+                filter: "wgpu=error,bevy_render=info,bevy_ecs=warn".into(),
+                ..default()
+            }),
+    );
+
     // Embed assets after DefaultPlugins are added
     embedded_asset!(app, "models/demo_model.toml");
     embedded_asset!(app, "models/demo_model.safetensors");
-    
+
     app.add_plugins(EmbeddedAssetsPlugin)
         .add_plugins(TextInputPlugin)
         .add_event::<PredictionRequest>()
@@ -60,14 +56,17 @@ fn main() {
             OnEnter(AppState::Error),
             (on_error_system, update_ui_for_error),
         )
-        .add_systems(Update, (
-            manage_input_focus,
-            sanitize_numeric_inputs,
-            validate_numeric_inputs,
-            update_input_styling,
-            update_button_interactions,
-            process_prediction_requests,
-            update_output_displays,
-        ))
+        .add_systems(
+            Update,
+            (
+                manage_input_focus,
+                sanitize_numeric_inputs,
+                validate_numeric_inputs,
+                update_input_styling,
+            ),
+        )
+        .add_systems(Update, update_button_interactions)
+        .add_systems(Update, process_prediction_requests)
+        .add_systems(Update, update_output_displays)
         .run();
 }

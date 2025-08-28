@@ -20,7 +20,7 @@
 //!
 //! // Define model architecture
 //! let input_size = 2;
-//! let output_size = 1; 
+//! let output_size = 1;
 //! let hidden_size = 4;
 //! let metadata = ModelMetadata::new(input_size, output_size, hidden_size)?;
 //! let model = DemoMLP::new(metadata.clone(), vb)?;
@@ -83,7 +83,9 @@ pub mod persistence;
 
 // Re-export core types and functions
 pub use model::{DemoMLP, ModelMetadata};
-pub use persistence::{load_model_from_files, load_model_from_data, parse_model_metadata, save_model_from_varmap};
+pub use persistence::{
+    load_model_from_data, load_model_from_files, parse_model_metadata, save_model_from_varmap,
+};
 
 // Re-export commonly needed Candle types for user convenience
 pub use candle_core::{DType, Device, Tensor};

@@ -12,7 +12,6 @@ pub struct TitleText;
 #[derive(Component)]
 pub struct StatusDisplay;
 
-
 #[derive(Component)]
 pub struct PredictButton;
 
@@ -52,8 +51,8 @@ impl Default for ValidationState {
         Self {
             input1_valid: false,
             input2_valid: false,
-            input1_empty: true,  // Start as empty
-            input2_empty: true,  // Start as empty
+            input1_empty: true, // Start as empty
+            input2_empty: true, // Start as empty
         }
     }
 }

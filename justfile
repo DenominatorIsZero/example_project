@@ -58,10 +58,6 @@ build-web:
 fmt:
     cargo fmt --all
 
-# Check formatting without making changes
-fmt-check:
-    cargo fmt --all --check
-
 # Run clippy linting
 lint:
     cargo clippy --workspace -- -D warnings
@@ -71,19 +67,11 @@ test:
     cargo test --workspace
 
 # Run all checks (format, lint, test)
-check: fmt-check lint test
+check: fmt lint test
 
-# Clean build artifacts
-clean:
-    cargo clean
 
 # Install required tools for development
 install-deps:
     rustup target add wasm32-unknown-unknown
     cargo install wasm-server-runner
     cargo install wasm-bindgen-cli
-    brew install binaryen
-
-# Full development setup from scratch
-setup: install-deps
-    @echo "Development environment ready!"

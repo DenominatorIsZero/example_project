@@ -88,10 +88,10 @@ pub fn save_model_from_varmap(
 /// # }
 /// ```
 pub fn parse_model_metadata(toml_bytes: &[u8]) -> Result<ModelMetadata> {
-    let toml_text = std::str::from_utf8(toml_bytes)
-        .context("Failed to convert TOML bytes to text")?;
-    let metadata: ModelMetadata = toml::from_str(toml_text)
-        .context("Failed to parse TOML metadata")?;
+    let toml_text =
+        std::str::from_utf8(toml_bytes).context("Failed to convert TOML bytes to text")?;
+    let metadata: ModelMetadata =
+        toml::from_str(toml_text).context("Failed to parse TOML metadata")?;
     Ok(metadata)
 }
 
@@ -126,19 +126,19 @@ pub fn parse_model_metadata(toml_bytes: &[u8]) -> Result<ModelMetadata> {
 /// # }
 /// ```
 pub fn load_model_from_data(
-    toml_bytes: &[u8], 
-    safetensors_bytes: &[u8], 
-    device: &Device
+    toml_bytes: &[u8],
+    safetensors_bytes: &[u8],
+    device: &Device,
 ) -> Result<DemoMLP> {
     let metadata = parse_model_metadata(toml_bytes)?;
-    
+
     // Load model weights using memory-based VarBuilder (WASM-compatible)
     let vb = VarBuilder::from_slice_safetensors(safetensors_bytes, DType::F32, device)
         .context("Failed to create VarBuilder from safetensors data")?;
-    
+
     // Create model with loaded parameters and metadata
     let model = DemoMLP::new(metadata, vb)?;
-    
+
     Ok(model)
 }
 
@@ -210,10 +210,10 @@ pub fn load_model_from_files(base_path: &str, device: &Device) -> Result<DemoMLP
     // Read both files into memory
     let toml_bytes = std::fs::read(&toml_path)
         .with_context(|| format!("Failed to read metadata file: {toml_path}"))?;
-    
+
     let safetensors_bytes = std::fs::read(&safetensors_path)
         .with_context(|| format!("Failed to read weights file: {safetensors_path}"))?;
-    
+
     // Use the memory-based function
     load_model_from_data(&toml_bytes, &safetensors_bytes, device)
 }
@@ -301,11 +301,11 @@ mod tests {
     fn test_parse_model_metadata() -> Result<()> {
         let toml_content = b"input_size = 2\noutput_size = 1\nhidden_size = 4";
         let metadata = parse_model_metadata(toml_content)?;
-        
+
         assert_eq!(metadata.input_size, 2);
         assert_eq!(metadata.output_size, 1);
         assert_eq!(metadata.hidden_size, 4);
-        
+
         Ok(())
     }
 

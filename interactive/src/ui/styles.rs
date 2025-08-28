@@ -1,7 +1,7 @@
 // UI style functions
 
-use bevy::prelude::*;
 use super::constants::*;
+use bevy::prelude::*;
 
 // UI Style Functions
 // Note: We use functions instead of constants because:

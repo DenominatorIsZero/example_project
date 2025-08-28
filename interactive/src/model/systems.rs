@@ -1,8 +1,8 @@
 // Model loading and state management systems
 
-use bevy::prelude::*;
-use crate::app::AppState;
 use super::{assets::*, loader::*, resources::*};
+use crate::app::AppState;
+use bevy::prelude::*;
 
 /// Start loading the embedded model assets
 pub fn start_loading_assets(mut commands: Commands, asset_server: Res<AssetServer>) {

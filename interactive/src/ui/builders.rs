@@ -3,8 +3,7 @@
 use super::{components::*, constants::*, styles::*};
 use bevy::prelude::*;
 use bevy_simple_text_input::{
-    TextInput, TextInputInactive, TextInputTextColor, TextInputTextFont,
-    TextInputValue,
+    TextInput, TextInputInactive, TextInputTextColor, TextInputTextFont, TextInputValue,
 };
 
 // UI Component Functions
@@ -125,11 +124,7 @@ pub fn spawn_input_field(builder: &mut ChildSpawnerCommands, label: &str, field_
 /// Spawn the predict button
 pub fn spawn_predict_button(builder: &mut ChildSpawnerCommands) {
     builder
-        .spawn((
-            Button,
-            button_style(),
-            PredictButton,
-        ))
+        .spawn((Button, button_style(), PredictButton))
         .with_children(|button| {
             button.spawn((
                 Text::new("Predict"),
@@ -181,9 +176,6 @@ pub fn spawn_output_section(builder: &mut ChildSpawnerCommands) {
 pub fn setup_ui(mut commands: Commands) {
     // Main container - full screen with dark background
     commands
-        .spawn((
-            main_container_style(),
-            MainContainer,
-        ))
+        .spawn((main_container_style(), MainContainer))
         .with_children(spawn_content_box);
 }

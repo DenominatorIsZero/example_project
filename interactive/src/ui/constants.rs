@@ -2,7 +2,8 @@
 
 use bevy::prelude::*;
 
-// Website-matching color palette  
+// Website-matching color palette
+#[allow(clippy::approx_constant)]
 pub const BACKGROUND_COLOR: Color = Color::srgb(0.216, 0.255, 0.318); // rgb(55 65 81) - website main background
 pub const TEXT_COLOR: Color = Color::WHITE;
 pub const GREEN_PRIMARY: Color = Color::srgb(0.133, 0.698, 0.298); // green-500: #22c55e  

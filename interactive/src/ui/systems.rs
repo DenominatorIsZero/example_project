@@ -2,19 +2,15 @@
 
 use super::{components::*, constants::*};
 use crate::model::{LoadedModel, LoadingError};
-use bevy::prelude::*;
 use bevy::ecs::system::ParamSet;
+use bevy::prelude::*;
 use bevy_simple_text_input::{TextInput, TextInputInactive, TextInputValue};
 use candle_core::IndexOp;
 use shared::{Device, Tensor};
 
 /// Handle button interactions with hover effects
-type ButtonInteractionQuery<'w, 's> = Query<
-    'w,
-    's,
-    (&'static Interaction, &'static mut BackgroundColor),
-    With<PredictButton>,
->;
+type ButtonInteractionQuery<'w, 's> =
+    Query<'w, 's, (&'static Interaction, &'static mut BackgroundColor), With<PredictButton>>;
 
 /// Query for input1 styling updates
 type Input1StylingQuery<'w, 's> = Query<
@@ -120,7 +116,6 @@ pub fn update_ui_for_error(
         *text = Text::new(format!("Model Status: Error - {}", error.message));
     }
 }
-
 
 /// Validate and parse numeric input from text input fields
 pub fn validate_numeric_inputs(
@@ -429,6 +424,7 @@ fn run_inference(
 }
 
 /// Update output displays when prediction results change
+#[allow(clippy::type_complexity)]
 pub fn update_output_displays(
     mut queries: ParamSet<(
         Query<&mut Text, With<OutputDisplay>>,
