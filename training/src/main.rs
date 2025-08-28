@@ -265,6 +265,21 @@ fn main() -> Result<()> {
         println!("Model saved successfully:");
         println!("  Metadata: {toml_path} ({toml_size} bytes)");
         println!("  Weights: {safetensors_path} ({safetensors_size} bytes)");
+
+        // Copy model files to interactive/src/models directory for embedded assets
+        println!("\n6. Copying model files for WASM embedded assets...");
+        let interactive_models_dir = "interactive/src/models";
+        std::fs::create_dir_all(interactive_models_dir)?;
+
+        let interactive_toml = format!("{interactive_models_dir}/demo_model.toml");
+        let interactive_safetensors = format!("{interactive_models_dir}/demo_model.safetensors");
+
+        std::fs::copy(&toml_path, &interactive_toml)?;
+        std::fs::copy(&safetensors_path, &interactive_safetensors)?;
+
+        println!("Files copied for embedded assets:");
+        println!("  Metadata: {interactive_toml}");
+        println!("  Weights: {interactive_safetensors}");
     } else {
         anyhow::bail!("Model files were not created successfully");
     }

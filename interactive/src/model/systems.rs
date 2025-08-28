@@ -8,7 +8,7 @@ use bevy::prelude::*;
 pub fn start_loading_assets(mut commands: Commands, asset_server: Res<AssetServer>) {
     info!("Loading embedded model assets...");
 
-    // Load the embedded assets using the original working path
+    // Load the embedded assets from interactive models directory
     let toml_handle = asset_server.load("embedded://interactive/models/demo_model.toml");
     let safetensors_handle =
         asset_server.load("embedded://interactive/models/demo_model.safetensors");

@@ -42,9 +42,19 @@ just --list
 ├── shared/                # Common library (model definitions, types)
 ├── training/              # Native binary for model training
 ├── interactive/           # WASM binary for web demo
-├── models/                # Generated model files (.safetensors)
+│   └── src/
+│       └── models/        # Model files for embedded assets (copied from training)
+├── models/                # Training output directory (.safetensors files)
 └── .cargo/config.toml     # WASM build configuration
 ```
+
+### Model File Workflow
+
+The training binary creates models in the workspace `models/` directory, then copies them to `interactive/src/models/` for use as embedded assets in the WASM build. This two-step process ensures:
+
+- **Training output**: Workspace `models/` directory for easy access and backup  
+- **WASM embedded assets**: `interactive/src/models/` directory required by Bevy's `embedded_asset!` macro
+- **Automatic workflow**: Running `just train` handles both saving and copying
 
 ## Dependencies
 
