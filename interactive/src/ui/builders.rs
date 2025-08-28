@@ -25,7 +25,7 @@ pub fn spawn_title(builder: &mut ChildSpawnerCommands) {
     builder.spawn((
         Text::new("Minimal AI Demo"),
         TextFont {
-            font_size: 28.0,
+            font_size: FONT_SIZE_TITLE,
             ..default()
         },
         TextColor(TEXT_COLOR),
@@ -38,7 +38,7 @@ pub fn spawn_status_display(builder: &mut ChildSpawnerCommands) {
     builder.spawn((
         Text::new("Model Status: Loading..."),
         TextFont {
-            font_size: 16.0,
+            font_size: FONT_SIZE_STANDARD,
             ..default()
         },
         TextColor(TEXT_COLOR),
@@ -75,7 +75,7 @@ pub fn spawn_input_field(builder: &mut ChildSpawnerCommands, label: &str, field_
             container.spawn((
                 Text::new(label),
                 TextFont {
-                    font_size: 14.0,
+                    font_size: FONT_SIZE_LABEL,
                     ..default()
                 },
                 TextColor(TEXT_COLOR),
@@ -85,10 +85,10 @@ pub fn spawn_input_field(builder: &mut ChildSpawnerCommands, label: &str, field_
             container.spawn((
                 Text::new("(-1.0 to 1.0)"),
                 TextFont {
-                    font_size: 12.0,
+                    font_size: FONT_SIZE_HINT,
                     ..default()
                 },
-                TextColor(Color::srgb(0.6, 0.6, 0.6)), // Light gray for subtle hint
+                TextColor(RANGE_HINT_COLOR),
             ));
 
             // Interactive text input field
@@ -98,7 +98,7 @@ pub fn spawn_input_field(builder: &mut ChildSpawnerCommands, label: &str, field_
                 input_field_style(),
                 TextInputValue("".to_string()), // Start with empty string
                 TextInputTextFont(TextFont {
-                    font_size: 14.0,
+                    font_size: FONT_SIZE_LABEL,
                     ..default()
                 }),
                 TextInputTextColor(TextColor(Color::BLACK)),
@@ -129,7 +129,7 @@ pub fn spawn_predict_button(builder: &mut ChildSpawnerCommands) {
             button.spawn((
                 Text::new("Predict"),
                 TextFont {
-                    font_size: 16.0,
+                    font_size: FONT_SIZE_STANDARD,
                     ..default()
                 },
                 TextColor(TEXT_COLOR),
@@ -145,7 +145,7 @@ pub fn spawn_output_section(builder: &mut ChildSpawnerCommands) {
             output.spawn((
                 Text::new("Output: --"),
                 TextFont {
-                    font_size: 16.0,
+                    font_size: FONT_SIZE_STANDARD,
                     ..default()
                 },
                 TextColor(TEXT_COLOR),
@@ -154,7 +154,7 @@ pub fn spawn_output_section(builder: &mut ChildSpawnerCommands) {
             output.spawn((
                 Text::new("True Value: --"),
                 TextFont {
-                    font_size: 16.0,
+                    font_size: FONT_SIZE_STANDARD,
                     ..default()
                 },
                 TextColor(TEXT_COLOR),
@@ -163,7 +163,7 @@ pub fn spawn_output_section(builder: &mut ChildSpawnerCommands) {
             output.spawn((
                 Text::new("Error: --"),
                 TextFont {
-                    font_size: 16.0,
+                    font_size: FONT_SIZE_STANDARD,
                     ..default()
                 },
                 TextColor(TEXT_COLOR),

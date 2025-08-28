@@ -136,7 +136,7 @@ pub fn validate_numeric_inputs(
             } else {
                 validation_state.input1_empty = false;
                 match input_text.parse::<f32>() {
-                    Ok(value) if (-1.0..=1.0).contains(&value) => {
+                    Ok(value) if (INPUT_MIN..=INPUT_MAX).contains(&value) => {
                         validation_state.input1_valid = true;
                         input_values.value1 = Some(value);
                     }
@@ -166,7 +166,7 @@ pub fn validate_numeric_inputs(
             } else {
                 validation_state.input2_empty = false;
                 match input_text.parse::<f32>() {
-                    Ok(value) if (-1.0..=1.0).contains(&value) => {
+                    Ok(value) if (INPUT_MIN..=INPUT_MAX).contains(&value) => {
                         validation_state.input2_valid = true;
                         input_values.value2 = Some(value);
                     }
@@ -197,22 +197,22 @@ pub fn update_input_styling(
 
         // Set background color based on focus state
         if is_focused {
-            *bg_color = BackgroundColor(Color::WHITE); // Focused: bright white
+            *bg_color = BackgroundColor(INPUT_FOCUSED_BG); // Focused: bright white
         } else {
-            *bg_color = BackgroundColor(Color::srgb(0.95, 0.95, 0.95)); // Unfocused: light gray
+            *bg_color = BackgroundColor(INPUT_UNFOCUSED_BG); // Unfocused: light gray
         }
 
         // Set border color based on validation state and focus
         if validation_state.input1_empty {
             if is_focused {
-                *border_color = BorderColor(Color::srgb(0.4, 0.6, 1.0)); // Focused blue
+                *border_color = BorderColor(INPUT_FOCUSED_BORDER); // Focused blue
             } else {
                 *border_color = BorderColor(GRAY_SECONDARY); // Unfocused gray
             }
         } else if validation_state.input1_valid {
             *border_color = BorderColor(GREEN_PRIMARY); // Valid input
         } else {
-            *border_color = BorderColor(Color::srgb(0.8, 0.2, 0.2)); // Invalid input (red)
+            *border_color = BorderColor(INPUT_INVALID_BORDER); // Invalid input (red)
         }
     }
 
@@ -222,22 +222,22 @@ pub fn update_input_styling(
 
         // Set background color based on focus state
         if is_focused {
-            *bg_color = BackgroundColor(Color::WHITE); // Focused: bright white
+            *bg_color = BackgroundColor(INPUT_FOCUSED_BG); // Focused: bright white
         } else {
-            *bg_color = BackgroundColor(Color::srgb(0.95, 0.95, 0.95)); // Unfocused: light gray
+            *bg_color = BackgroundColor(INPUT_UNFOCUSED_BG); // Unfocused: light gray
         }
 
         // Set border color based on validation state and focus
         if validation_state.input2_empty {
             if is_focused {
-                *border_color = BorderColor(Color::srgb(0.4, 0.6, 1.0)); // Focused blue
+                *border_color = BorderColor(INPUT_FOCUSED_BORDER); // Focused blue
             } else {
                 *border_color = BorderColor(GRAY_SECONDARY); // Unfocused gray
             }
         } else if validation_state.input2_valid {
             *border_color = BorderColor(GREEN_PRIMARY); // Valid input
         } else {
-            *border_color = BorderColor(Color::srgb(0.8, 0.2, 0.2)); // Invalid input (red)
+            *border_color = BorderColor(INPUT_INVALID_BORDER); // Invalid input (red)
         }
     }
 }
@@ -294,7 +294,7 @@ fn sanitize_numeric_string(input: &str) -> String {
 
     // If we have a valid number, clamp it to our range
     if let Ok(value) = result.parse::<f32>() {
-        let clamped = value.clamp(-1.0, 1.0);
+        let clamped = value.clamp(INPUT_MIN, INPUT_MAX);
         if (clamped - value).abs() > f32::EPSILON {
             // Value was clamped, format it nicely
             if clamped.fract() == 0.0 && clamped.abs() < 1000.0 {

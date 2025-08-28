@@ -72,7 +72,7 @@ _Estimated effort: 2-3 hours_
 
 #### 1.3 Extract UI Configuration Constants
 
-**Status**: [ ] Pending  
+**Status**: [x] Completed  
 **Dependencies**: None  
 **Definition of Done**:
 
@@ -82,11 +82,11 @@ _Estimated effort: 2-3 hours_
 
 **Implementation Steps**:
 
-- [ ] Create comprehensive UI constants file with font sizes, spacing, dimensions
-- [ ] Extract hard-coded values from builders.rs (28.0, 16.0, 14.0 font sizes, etc.)
-- [ ] Add documentation comments explaining each constant's usage
-- [ ] Update all UI code to use centralized constants
-- [ ] Verify visual appearance remains unchanged
+- [x] Create comprehensive UI constants file with font sizes, spacing, dimensions
+- [x] Extract hard-coded values from builders.rs (28.0, 16.0, 14.0 font sizes, etc.)
+- [x] Add documentation comments explaining each constant's usage
+- [x] Update all UI code to use centralized constants
+- [x] Verify visual appearance remains unchanged
 
 ---
 
