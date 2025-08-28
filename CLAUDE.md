@@ -46,17 +46,14 @@ This project is designed to be developed extensively with Claude Code assistance
 
 ### Documentation Structure
 
-The `docs/` folder contains two key subdirectories that support the AI-assisted development process:
+The `docs/` folder contains project organization that supports the AI-assisted development process:
 
-- **`docs/specs/project-name/`** - Project-specific specification documents
-  - Organized by project to support multiple AI projects in same template
-  - Complete specification suite: overview, technical requirements, testing, implementation guide
+- **`docs/projects/project-name/`** - Active and archived projects
+  - Each project contains specifications and implementation plan
+  - `specs/` subdirectory with complete specification suite: overview, technical requirements, testing, implementation guide
+  - `plan.md` with actionable, atomic tasks and discrete todos
   - Clear problem statements, success criteria, and acceptance criteria
   - Technical constraints and architectural considerations
-  
-- **`docs/plans/project-name/`** - Project-specific implementation plans
-  - Corresponds to specifications in matching `docs/specs/project-name/` folder
-  - Broken down into actionable, atomic tasks with discrete todos
   - Dependencies and sequencing clearly defined
 
 ### Three-Phase Development Process
@@ -139,11 +136,11 @@ Follow this format for AI workflow commits:
 [PHASE] Brief description of change
 
 - Specific changes made
-- Reference to docs/specs/ or docs/plans/ files
+- Reference to docs/projects/ files
 - Any deviations from original plan
 
 Closes: #issue-number (if applicable)
-Refs: docs/specs/feature-name.md, docs/plans/feature-name.md
+Refs: docs/projects/feature-name/specs/feature-name.md, docs/projects/feature-name/plan.md
 ```
 
 **IMPORTANT**: Do NOT include "Generated with Claude Code" footers or "Co-Authored-By: Claude" lines in commit messages. Use only the clean format shown above.
@@ -156,7 +153,7 @@ Examples:
 - Defined security requirements and session management
 - Identified integration points with existing user system
 
-Refs: docs/specs/user-authentication.md
+Refs: docs/projects/user-authentication/specs/user-authentication.md
 ```
 
 ```
@@ -166,7 +163,7 @@ Refs: docs/specs/user-authentication.md
 - Identified dependencies on existing user model
 - Planned database migration and API changes
 
-Refs: docs/plans/user-authentication.md
+Refs: docs/projects/user-authentication/plan.md
 ```
 
 ```
@@ -177,7 +174,7 @@ Refs: docs/plans/user-authentication.md
 - Updated user model with OAuth provider fields
 - Added comprehensive error handling
 
-Refs: docs/specs/user-authentication.md, docs/plans/user-authentication.md
+Refs: docs/projects/user-authentication/specs/user-authentication.md, docs/projects/user-authentication/plan.md
 ```
 
 #### Branching Strategy

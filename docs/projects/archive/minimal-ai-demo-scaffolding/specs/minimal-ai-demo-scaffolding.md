@@ -64,7 +64,7 @@ Interactive: Load Model → User Input → Inference → Display Output
 ```
 project-root/
 ├── Cargo.toml                    # Workspace configuration
-├── docs/specs/                   # Specification documents
+├── docs/projects/                # Project specifications and plans
 ├── training/                     # Native ML training binary
 ├── interactive/                  # Bevy WASM demo
 ├── shared/                       # Common library (models, types, persistence)

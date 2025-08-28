@@ -96,4 +96,4 @@ This scaffolding provides the foundation for AI demo projects. Implement your sp
 3. Create interactive demo UI in `interactive/`
 4. Deploy WASM build to your web application
 
-For detailed implementation guidance, see `docs/plans/` and `docs/specs/`.
+For detailed implementation guidance, see `docs/projects/`.

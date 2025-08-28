@@ -119,7 +119,7 @@ _Estimated effort: 3-4 hours_
 
 #### 2.2 Archive Current Implementation Documentation
 
-**Status**: [ ] Pending  
+**Status**: [x] Completed  
 **Dependencies**: None  
 **Definition of Done**:
 
@@ -129,11 +129,11 @@ _Estimated effort: 3-4 hours_
 
 **Implementation Steps**:
 
-- [ ] Create `docs/examples/minimal-ai-demo/` directory structure
-- [ ] Move current specs from `docs/specs/minimal-ai-demo-scaffolding/` to examples
-- [ ] Move current plan from `docs/plans/minimal-ai-demo-scaffolding/` to examples
-- [ ] Update any internal references to new locations
-- [ ] Add README in examples directory explaining the reference implementation
+- [x] Create `docs/projects/archive/minimal-ai-demo-scaffolding/` directory structure
+- [x] Move current specs from `docs/specs/minimal-ai-demo-scaffolding/` to examples
+- [x] Move current plan from `docs/plans/minimal-ai-demo-scaffolding/` to examples  
+- [x] Update any internal references to new locations
+- [x] Add README in examples directory explaining the reference implementation
 
 #### 2.3 Create Template Specifications and Plans
 
