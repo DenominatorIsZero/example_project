@@ -4,40 +4,37 @@
 default:
     @just --list
 
-# Build all workspace components
+# Setup and Maintenance Commands
+
+# Install WASM target and required development tools
+setup:
+    rustup target add wasm32-unknown-unknown
+    cargo install wasm-server-runner
+    cargo install wasm-bindgen-cli
+
+# Clean all build artifacts
+clean:
+    cargo clean
+
+# Build Commands
+
+# Build all workspace components (debug)
 build:
     cargo build --workspace
 
-# Build with release optimizations
+# Build all workspace components (release)
 build-release:
     cargo build --workspace --release
 
-# Run the training binary
-train:
-    cargo run --bin training
-
-# Build interactive demo for WASM
+# Build WASM binary (debug) - for testing with wasm-server-runner
 build-wasm:
     cargo build --target wasm32-unknown-unknown --bin interactive
 
-# Build WASM with release optimizations
+# Build WASM binary (release) - for testing with wasm-server-runner
 build-wasm-release:
     cargo build --target wasm32-unknown-unknown --bin interactive --release
 
-# Run interactive demo on native
-interactive:
-    cargo run --bin interactive
-
-# Run interactive demo with WASM development server
-demo:
-    cargo run --target wasm32-unknown-unknown --bin interactive
-
-# Run optimized WASM demo (size-optimized release build)
-demo-release:
-    cargo build --target wasm32-unknown-unknown --bin interactive --release
-    wasm-server-runner target/wasm32-unknown-unknown/release/interactive.wasm
-
-# Build web package with wasm-bindgen for deployment
+# Build web package with wasm-bindgen (for website deployment)
 build-web:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -54,6 +51,32 @@ build-web:
     echo "Files generated:"
     ls -lh interactive/web/
 
+# Run Commands
+
+# Run the training binary
+train:
+    cargo run --bin training
+
+# Run interactive demo natively (not WASM)
+interactive:
+    cargo run --bin interactive
+
+# Run WASM demo with development server (debug build)
+wasm: build-wasm
+    wasm-server-runner target/wasm32-unknown-unknown/debug/interactive.wasm
+
+# Run WASM demo with development server (release build)
+wasm-release: build-wasm-release
+    wasm-server-runner target/wasm32-unknown-unknown/release/interactive.wasm
+
+# Serve built web package locally for testing
+serve-web:
+    @echo "Starting local server for web package..."
+    @echo "Open http://localhost:8000 in your browser"
+    @cd interactive/web && python -m http.server 8000
+
+# Code Quality Commands
+
 # Format all code
 fmt:
     cargo fmt --all
@@ -68,10 +91,3 @@ test:
 
 # Run all checks (format, lint, test)
 check: fmt lint test
-
-
-# Install required tools for development
-install-deps:
-    rustup target add wasm32-unknown-unknown
-    cargo install wasm-server-runner
-    cargo install wasm-bindgen-cli

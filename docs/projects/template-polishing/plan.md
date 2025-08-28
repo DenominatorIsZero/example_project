@@ -32,7 +32,7 @@ _Estimated effort: 2-3 hours_
 
 #### 1.1 Clean Up Build System
 
-**Status**: [ ] Pending  
+**Status**: [x] Completed  
 **Dependencies**: None  
 **Definition of Done**:
 
@@ -43,11 +43,13 @@ _Estimated effort: 2-3 hours_
 
 **Implementation Steps**:
 
-- [ ] Remove redundant build commands (`build-wasm`, `build-wasm-release` vs `build-web`)
-- [ ] Rename `install-deps` to `setup` for consistency with README
-- [ ] Add `clean` command for workspace cleanup
-- [ ] Improve command descriptions and organization
-- [ ] Test all commands work correctly
+- [x] Reorganize commands into logical groups (Setup, Build, Run, Code Quality)
+- [x] Rename `install-deps` to `setup` for consistency with README
+- [x] Add `clean` command for workspace cleanup
+- [x] Add `serve-web` command for local web testing
+- [x] Improve command descriptions and clarify when to use each command
+- [x] Make `demo` and `demo-release` commands composable (depend on build commands)
+- [x] Test all commands work correctly
 
 #### 1.2 Consolidate Model Files
 
