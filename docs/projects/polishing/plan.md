@@ -168,7 +168,7 @@ _Estimated effort: 2-3 hours_
 
 #### 3.1 Rewrite README for Template Usage
 
-**Status**: [ ] Pending  
+**Status**: [x] Completed  
 **Dependencies**: Phase 1.1 (justfile cleanup)  
 **Definition of Done**:
 
@@ -179,31 +179,29 @@ _Estimated effort: 2-3 hours_
 
 **Implementation Steps**:
 
-- [ ] Rewrite introduction as template description
-- [ ] Create "Quick Start" section for immediate template usage
-- [ ] Add "Template Customization" section covering key modification points
-- [ ] Document web integration approach (iframe, responsive design, colors)
-- [ ] Add "Project Structure" section explaining template organization
-- [ ] Include troubleshooting section for common WASM/Bevy issues
-- [ ] Update all command examples to reflect cleaned justfile
+- [x] Rewrite introduction as template description
+- [x] Create "Quick Start" section for immediate template usage
+- [x] Add "Template Customization" section covering key modification points
+- [x] Document web integration approach (iframe, responsive design, colors)
+- [x] Add "Project Structure" section explaining template organization
+- [x] Include troubleshooting section for common WASM/Bevy issues
+- [x] Update all command examples to reflect cleaned justfile
 
 #### 3.2 Create Template Usage Examples
 
-**Status**: [ ] Pending  
+**Status**: [x] Skipped (Not Required)  
 **Dependencies**: Phase 2.1 (architecture docs)  
-**Definition of Done**:
+**Rationale**: 
 
-- Clear examples of common template modifications
-- Step-by-step customization workflows
-- Code examples for typical adaptations
+Task 3.2 was originally intended to add detailed code examples and step-by-step customization workflows. However, after completing Task 3.1, the README already provides comprehensive template usage guidance including:
 
-**Implementation Steps**:
+- Concrete code examples for UI customization with specific constants
+- Complete development workflow with step-by-step instructions
+- Clear file locations marked with 🎯 indicators for customization points
+- Practical examples (iframe HTML, command workflows, troubleshooting solutions)
+- Specific guidance on color theming, model architecture, and training data adaptation
 
-- [ ] Add code examples for model swapping in README
-- [ ] Document UI customization workflow with examples
-- [ ] Show color theme modification examples
-- [ ] Include web deployment examples
-- [ ] Add performance optimization guidance
+Adding additional examples would make the README overly verbose without providing significant additional value. The current README strikes the right balance between comprehensive guidance and readability for template users.
 
 ---
 
