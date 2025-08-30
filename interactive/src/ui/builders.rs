@@ -23,7 +23,7 @@ pub fn spawn_content_box(builder: &mut ChildSpawnerCommands) {
 /// Spawn the title text
 pub fn spawn_title(builder: &mut ChildSpawnerCommands) {
     builder.spawn((
-        Text::new("Minimal AI Demo"),
+        Text::new("AI Demo Template"),
         TextFont {
             font_size: FONT_SIZE_TITLE,
             ..default()
