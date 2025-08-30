@@ -1,43 +1,69 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with this AI demo project repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with this AI Demo Template repository.
 
 ## Project Overview
 
-This is an AI demonstration project designed to be integrated with the main website at https://github.com/DenominatorIsZero/rust-website. The project follows a standardized Cargo workspace structure with separate binaries for model training and interactive WASM demonstration.
+This is an AI Demo Template designed to be a reusable foundation for creating machine learning demonstration projects. The template provides a complete workflow from model training to web deployment, following a standardized Cargo workspace structure with separate binaries for model training and interactive WASM demonstration.
+
+**Repository**: https://github.com/DenominatorIsZero/example_project
 
 ## Repository Structure
 
 ```
-demo-project-name/
-├── Cargo.toml                 # Workspace root configuration
-├── docs/                     # AI-assisted development documentation
-│   ├── specs/                # Feature specifications and requirements
-│   │   └── project-name/     # Project-specific specification documents
-│   └── plans/                # Implementation plans with discrete todos
-│   │   └── project-name/     # Project-specific implementation plans
+ai-demo-template/
+├── Cargo.toml                # Workspace root configuration with metadata
+├── LICENSE                   # MIT license for template usage
+├── CONTRIBUTING.md           # Template contribution guidelines
+├── README.md                 # Template usage guide and customization
+├── justfile                  # Development commands and build automation
+├── .gitignore               # Comprehensive development environment coverage
+├── docs/                    # AI-assisted development documentation
+│   ├── architecture.md      # Technical architecture and design decisions
+│   └── projects/            # Project-based documentation organization
+│       ├── archive/         # Completed project specifications and plans
+│       │   └── minimal-ai-demo-scaffolding/
+│       ├── template/        # Reusable specification and plan templates
+│       └── polishing/       # Template polishing implementation plan
 ├── training/
-│   ├── Cargo.toml            # Native training binary dependencies
-│   ├── src/
-│   │   └── main.rs           # Model training implementation
-│   ├── data/                 # Training data and preprocessing scripts
-│   └── README.md             # Training-specific documentation
-├── interactive/
-│   ├── Cargo.toml            # WASM demo binary dependencies
-│   ├── src/
-│   │   └── main.rs           # Bevy + Candle inference application
-│   ├── assets/               # Bevy-specific assets (textures, sounds, etc.)
-│   └── README.md             # Interactive demo documentation
-├── shared/
-│   ├── Cargo.toml            # Shared library crate
+│   ├── Cargo.toml           # Native training binary with metadata
 │   └── src/
-│       ├── lib.rs            # Common exports
-│       ├── model.rs          # Model architecture definitions
-│       ├── preprocessing.rs  # Data preprocessing utilities
-│       └── types.rs          # Shared data structures
-├── models/                   # Generated .safetensors files
-├── README.md                 # Project overview and usage
-└── build.sh                 # Build script for both training and WASM
+│       └── main.rs          # Model training implementation
+├── interactive/
+│   ├── Cargo.toml           # WASM demo binary with metadata
+│   ├── src/
+│   │   ├── main.rs          # Bevy application entry point
+│   │   ├── lib.rs           # Library exports for WASM
+│   │   ├── app.rs           # Application setup and configuration
+│   │   ├── model/           # Model loading and inference systems
+│   │   │   ├── mod.rs
+│   │   │   ├── assets.rs
+│   │   │   ├── loader.rs
+│   │   │   ├── resources.rs
+│   │   │   └── systems.rs
+│   │   ├── models/          # Embedded model files
+│   │   │   ├── demo_model.toml
+│   │   │   └── demo_model.safetensors
+│   │   └── ui/              # Modular UI system
+│   │       ├── mod.rs
+│   │       ├── components.rs    # UI component definitions
+│   │       ├── constants.rs     # Customizable design constants
+│   │       ├── builders.rs      # UI construction functions
+│   │       ├── styles.rs        # Styling and layout functions
+│   │       └── systems.rs       # UI behavior and event handling
+│   ├── tests/               # Interactive demo test suite
+│   └── web/                 # Generated web deployment package
+├── shared/
+│   ├── Cargo.toml           # Shared library with metadata
+│   ├── src/
+│   │   ├── lib.rs           # Common exports
+│   │   ├── model.rs         # Model architecture definitions
+│   │   └── persistence.rs   # Model loading and saving utilities
+│   └── tests/
+│       └── integration_tests.rs
+└── models/                  # Generated model files from training
+    ├── demo_model.toml
+    └── demo_model.safetensors
 ```
 
 ## AI-Assisted Development Workflow
@@ -48,13 +74,19 @@ This project is designed to be developed extensively with Claude Code assistance
 
 The `docs/` folder contains project organization that supports the AI-assisted development process:
 
-- **`docs/projects/project-name/`** - Active and archived projects
-  - Each project contains specifications and implementation plan
-  - `specs/` subdirectory with complete specification suite: overview, technical requirements, testing, implementation guide
-  - `plan.md` with actionable, atomic tasks and discrete todos
-  - Clear problem statements, success criteria, and acceptance criteria
-  - Technical constraints and architectural considerations
-  - Dependencies and sequencing clearly defined
+- **`docs/projects/`** - Project-based documentation organization
+  - **`archive/`** - Completed projects with their specifications and implementation plans
+    - Contains the original minimal-ai-demo-scaffolding project as reference
+  - **`template/`** - Reusable specification and plan templates for new projects
+    - `spec-template.md` - Generic project specification template
+    - `plan-template.md` - Phase-based implementation plan template
+  - **`polishing/`** - Template polishing project with comprehensive implementation plan
+- **`docs/architecture.md`** - Technical architecture documentation covering:
+  - Workspace design rationale and three-crate structure
+  - WASM integration strategy and responsive design
+  - Model persistence architecture with embedded assets
+  - UI architecture using Bevy ECS patterns
+  - Build system and development workflow
 
 ### Three-Phase Development Process
 
@@ -112,6 +144,30 @@ Implement plans step-by-step with Claude Code assistance:
 - **Iterative Refinement** - Use multiple rounds of feedback to improve specifications and implementations
 - **Documentation First** - Always document decisions and rationale for future reference
 - **Validation Focus** - Ask Claude Code to help validate implementations against specifications
+
+#### CLAUDE.md Maintenance
+
+**IMPORTANT**: Keep this file current to improve future AI interactions.
+
+**When to update CLAUDE.md:**
+- After major architectural changes or refactoring
+- When new development patterns or workflows are established
+- After discovering common issues and their solutions
+- When user has to correct AI assumptions or provide missing context
+- After adding new tools, dependencies, or build processes
+
+**Proactive Update Protocol:**
+- Claude Code should offer to update CLAUDE.md after significant changes
+- Focus on generic guidance that benefits future interactions
+- Document new patterns, workflows, or common corrections
+- Update file paths, command references, or architectural descriptions
+- Add lessons learned from debugging or problem-solving sessions
+
+Example trigger situations:
+- "You should use X instead of Y" → Add to development guidelines
+- "The files are actually located in Z" → Update repository structure
+- "This command doesn't work, use this instead" → Update development commands
+- Major refactoring or new features → Update relevant sections
 
 ### Commit Strategy
 
@@ -186,106 +242,171 @@ Refs: docs/projects/user-authentication/specs/user-authentication.md, docs/proje
 
 ## Development Commands
 
+The template uses a `justfile` for streamlined development workflow. All commands should be run from the repository root.
+
+### Setup and Prerequisites
+
+```bash
+# One-time setup: Install WASM target and development tools
+just setup
+
+# Install just command runner if not already installed
+cargo install just
+
+# See all available commands
+just --list
+```
+
 ### Model Training
 
 ```bash
-# Train the model (from repository root)
+# Train the model (generates files in models/ directory)
+just train
+
+# Direct cargo command (if needed for debugging)
 cargo run --bin training
-
-# Train with specific parameters
-cargo run --bin training -- --epochs 100 --batch-size 32
-
-# Validate trained model
-cargo run --bin training -- --validate-only
 ```
 
 ### Interactive Demo Development
 
 ```bash
-# Install wasm-pack if not already installed
-curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+# Test natively during development (fastest iteration)
+just interactive
 
-# Build WASM demo for development
-cd interactive
-wasm-pack build --target web --dev
+# Test WASM build locally with development server
+just wasm
 
-# Build WASM demo for production
-cd interactive
-wasm-pack build --target web --release
-
-# Serve locally for testing (requires basic HTTP server)
-cd interactive/pkg && python -m http.server 8000
+# Test WASM release build locally
+just wasm-release
 ```
 
-### Complete Build Process
+### Build Commands
 
 ```bash
-# Build everything (training + WASM)
-./build.sh
+# Build all workspace components (debug)
+just build
 
-# Or manually:
-cargo run --bin training                          # Generate models
-cd interactive && wasm-pack build --target web    # Build WASM
+# Build all workspace components (release)
+just build-release
+
+# Build complete web package for deployment
+just build-web
+
+# Serve built web package locally for testing
+just serve-web
+```
+
+### Code Quality
+
+```bash
+# Format all code
+just fmt
+
+# Run clippy linting
+just lint
+
+# Run test suite
+just test
+
+# Run all quality checks (format + lint + test)
+just check
 ```
 
 ## Technology Stack
 
 ### Training Binary (`training/`)
 
-- **Framework**: Native Rust with Candle for model training
-- **Data**: Custom dataset loading and preprocessing
-- **Output**: .safetensors model files in `models/` directory
-- **Dependencies**: candle-core, candle-nn, candle-optimizers
+- **Framework**: Native Rust with Candle 0.9 for model training
+- **Data**: Synthetic dataset generation (easily replaceable)
+- **Output**: .safetensors and .toml model files in `models/` directory
+- **Dependencies**: candle-core, candle-nn, candle-optimizers, rand 0.9.2, shared crate
 
 ### Interactive Demo (`interactive/`)
 
-- **Framework**: Bevy game engine compiled to WASM
-- **AI Inference**: Candle for model loading and inference
-- **Target**: WebAssembly with wasm-bindgen
-- **Dependencies**: bevy, candle-core, wasm-bindgen, web-sys
+- **Framework**: Bevy 0.16 game engine compiled to WASM
+- **AI Inference**: Candle 0.9 for model loading and inference
+- **UI Components**: bevy-simple-text-input for interactive elements
+- **Target**: WebAssembly with wasm-bindgen integration
+- **Model Loading**: Embedded assets using Bevy's asset system
+- **Dependencies**: bevy, candle-core, candle-nn, bevy-simple-text-input, shared crate
 
 ### Shared Library (`shared/`)
 
-- **Purpose**: Common model definitions and utilities
+- **Purpose**: Common model definitions and persistence utilities
 - **Usage**: Imported by both training and interactive binaries
-- **Contents**: Model architecture, data types, preprocessing functions
+- **Contents**: Model architecture (`DemoMLP`), model persistence (memory and file loading)
+- **Dependencies**: candle-core, candle-nn, safetensors, serde, toml
 
-## Integration with Main Website
+### Build System
+
+- **Command Runner**: just (Justfile-based workflow)
+- **WASM Compilation**: wasm-bindgen with web target
+- **Package Management**: Cargo workspace with shared dependencies
+- **Rust Edition**: 2024 edition with workspace metadata
+
+## Template Usage and Integration
+
+### Template Adaptation Workflow
+
+When using this template for a new AI demo project:
+
+1. **Copy the template**: Fork or clone this repository
+2. **Customize the model**: Modify `shared/src/model.rs` for your neural network architecture
+3. **Update training data**: Replace synthetic data in `training/src/main.rs` with your dataset
+4. **Customize UI**: Modify `interactive/src/ui/constants.rs` for colors, fonts, and layout
+5. **Update metadata**: Change project names, descriptions, and repository URLs in `Cargo.toml` files
+
+### Web Integration
+
+The template is designed for web deployment with responsive iframe embedding:
+
+```html
+<!-- Responsive iframe for blog posts -->
+<iframe src="/demos/your-project-name" width="800" height="600"></iframe>
+```
 
 ### Asset Deployment
 
-After building, copy generated files to the main website:
+After building with `just build-web`, deploy the generated files:
 
 ```bash
-# Copy WASM files
-cp interactive/pkg/* ../rust-website/static/wasm/project-name/
+# Generated web package is in interactive/web/
+# Contains: interactive.wasm, interactive.js, index.html
 
-# Copy model files
-cp models/* ../rust-website/static/models/project-name/
+# Copy to your web server
+cp interactive/web/* /path/to/your/website/demos/project-name/
 ```
 
-### URL Structure
+### Template Features for Integration
 
-- Demo accessible at: `https://erik-engelhardt.com/demos/project-name`
-- WASM assets served from: `/static/wasm/project-name/`
-- Model files served from: `/static/models/project-name/`
-
-### Iframe Integration
-
-The demo can be embedded in blog posts using:
-
-```html
-<iframe src="/demos/project-name" width="800" height="600"></iframe>
-```
+- **Responsive Design**: Automatically fits parent container
+- **Self-Contained**: All assets embedded in WASM binary
+- **Theme Matching**: Customizable colors in `ui/constants.rs`
+- **Professional Metadata**: Complete package information and licensing
 
 ## Development Guidelines
 
 ### Code Organization
 
-- Keep model architecture definitions in `shared/src/model.rs`
-- Implement training logic in `training/src/main.rs`
-- Implement Bevy app logic in `interactive/src/main.rs`
-- Share preprocessing utilities through `shared/src/preprocessing.rs`
+- **Model Architecture**: Define models in `shared/src/model.rs`
+- **Model Persistence**: Loading/saving utilities in `shared/src/persistence.rs`
+- **Training Logic**: Implement in `training/src/main.rs`
+- **Application Setup**: Main Bevy app configuration in `interactive/src/main.rs`
+- **UI Constants**: Customizable design values in `interactive/src/ui/constants.rs`
+- **UI Components**: Component definitions in `interactive/src/ui/components.rs`
+- **UI Systems**: Behavior and event handling in `interactive/src/ui/systems.rs`
+- **Model Systems**: Inference and loading in `interactive/src/model/systems.rs`
+
+### Template Customization Points
+
+Key files to modify when adapting the template:
+
+- **`interactive/src/ui/constants.rs`** 🎯 - Colors, fonts, spacing, layout dimensions
+- **`shared/src/model.rs`** 🎯 - Neural network architecture and forward pass
+- **`training/src/main.rs`** 🎯 - Training data, loss function, hyperparameters
+- **`interactive/src/ui/builders.rs`** - UI layout and component structure
+- **`interactive/src/ui/systems.rs`** - Input validation and prediction logic
+- **`Cargo.toml` files** - Project metadata, descriptions, repository URLs
 
 ### Model Constraints
 
@@ -296,10 +417,11 @@ The demo can be embedded in blog posts using:
 
 ### WASM Optimization
 
-- Use `--release` builds for production deployment
-- Enable `wee_alloc` for smaller binary sizes
+- Use `just build-web` for production deployment (includes release optimizations)
+- Size optimization profile enabled: `opt-level = 'z'`, `lto = true`, `strip = "symbols"`
 - Minimize unnecessary Bevy features in Cargo.toml
 - Consider `wasm-opt` for additional size optimization
+- Embedded assets eliminate network requests for model files
 
 ### Error Handling
 
@@ -352,10 +474,11 @@ The demo can be embedded in blog posts using:
 
 ### WASM Build Issues
 
-- Ensure wasm-pack is up to date
-- Check target compatibility (web vs bundler)
-- Verify all dependencies support WASM compilation
-- Review console errors for specific failure points
+- Ensure wasm-server-runner and wasm-bindgen-cli are installed (`just setup`)
+- Use `just wasm` for development testing instead of manual compilation
+- Verify all dependencies support WASM compilation (check Cargo.toml features)
+- Review browser console errors for specific failure points
+- Long compile times (5+ minutes) are normal for Bevy + Candle WASM builds
 
 ### Bevy Integration Issues
 
@@ -364,27 +487,37 @@ The demo can be embedded in blog posts using:
 - Verify asset loading paths for WASM target
 - Test UI scaling on different screen sizes
 
+## Template Files
+
+### Documentation and Licensing
+
+- **`LICENSE`**: MIT license enabling free template usage and modification
+- **`CONTRIBUTING.md`**: Guidelines for contributing to the template (not using it)
+- **`README.md`**: Comprehensive template usage guide with customization instructions
+- **`docs/architecture.md`**: Technical architecture and design decisions
+- **`docs/projects/template/`**: Reusable specification and plan templates for new projects
+
+### Development Tools
+
+- **`justfile`**: Streamlined development commands replacing complex shell scripts
+- **`.gitignore`**: Comprehensive coverage for Rust, IDE, OS, and development artifacts
+
 ## Contributing Guidelines
 
-### Before Making Changes
+This is a **template project** designed for reuse. See `CONTRIBUTING.md` for detailed contribution guidelines.
 
-1. Understand the existing model architecture
-2. Test training pipeline with small datasets
-3. Verify WASM compilation succeeds
-4. Check integration with main website
+### Quick Contributing Guide
+
+1. **Template improvements**: Focus on changes that benefit all template users
+2. **Test thoroughly**: Run `just check` and verify WASM builds work
+3. **Maintain simplicity**: Avoid over-engineering or unnecessary complexity
+4. **Update documentation**: Keep README and architecture docs current
 
 ### Code Style
 
-- Follow standard Rust formatting (rustfmt)
-- Use meaningful variable and function names
-- Document public APIs and complex algorithms
-- Include examples in documentation comments
+- **Formatting**: Use `just fmt` (standard rustfmt)
+- **Quality**: Use `just lint` (clippy with warnings as errors)
+- **Testing**: Use `just test` (comprehensive test coverage)
+- **Architecture**: Maintain clean separation between training/interactive/shared crates
 
-### Commit Guidelines
-
-- Keep training and interactive changes separate when possible
-- Include model performance metrics in commit messages
-- Update README.md for significant changes
-- Test both training and WASM builds before committing
-
-This project structure enables complete reproducibility while maintaining clean separation between training and deployment concerns.
+This template structure enables complete reproducibility while maintaining clean separation between training and deployment concerns, designed specifically as a foundation for creating new AI demonstration projects.
