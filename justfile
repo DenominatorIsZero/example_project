@@ -1,4 +1,4 @@
-# AI Demo Scaffolding - Development Commands
+# AI Demo Template - Development Commands
 
 # Default recipe shows available commands
 default:

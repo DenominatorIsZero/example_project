@@ -1,6 +1,6 @@
 # Architecture Documentation
 
-Comprehensive technical overview of the AI Demo Scaffolding template architecture, design decisions, and integration strategies.
+Comprehensive technical overview of the AI Demo Template architecture, design decisions, and integration strategies.
 
 ## Table of Contents
 
@@ -38,7 +38,7 @@ This project is designed as a **reusable template** for creating AI demonstratio
 - Responsive UI adapts to different deployment contexts
 
 **3. Website Integration**
-- Color palette matches target website themes
+- Color palette designed for template creator's website (customizable)
 - Responsive design for iframe embedding
 - Optimized bundle sizes for web deployment
 
@@ -314,8 +314,8 @@ pub const GRAY_SECONDARY: Color = Color::srgb(0.294, 0.333, 0.388);   // content
 ```
 
 **Color System Benefits:**
-- 🎨 **Visual Consistency**: Matches parent website aesthetics
-- 🔧 **Easy Customization**: Single file controls all colors
+- 🎨 **Visual Consistency**: Default colors designed for template creator's website
+- 🔧 **Easy Customization**: Single file controls all colors for your branding
 - ♿ **Accessibility**: Sufficient contrast ratios maintained
 - 📱 **Cross-Platform**: Colors work on all display types
 

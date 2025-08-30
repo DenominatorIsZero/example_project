@@ -18,7 +18,7 @@ fn main() {
         DefaultPlugins
             .set(WindowPlugin {
                 primary_window: Some(Window {
-                    title: "AI Demo - Minimal Scaffolding".into(),
+                    title: "AI Demo Template".into(),
                     fit_canvas_to_parent: true,
                     resizable: true,
                     ..default()
