@@ -1,7 +1,15 @@
 [package]
 name = "training"
-version = "0.1.0"
-edition = "2024"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "Model training binary for AI demonstration templates using Candle ML framework"
 
 [[bin]]
 name = "training"
@@ -12,7 +20,7 @@ candle-core = { workspace = true }
 candle-nn = { workspace = true }
 anyhow = { workspace = true }
 shared = { path = "../shared" }
-rand = "0.8"
+rand = "0.9.2"
 candle-optimisers = "0.9"
 
 [dev-dependencies]

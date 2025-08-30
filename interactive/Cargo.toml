@@ -1,7 +1,15 @@
 [package]
 name = "interactive"
-version = "0.1.0"
-edition = "2024"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "Interactive WASM demo binary for AI demonstrations using Bevy and Candle"
 
 
 [[bin]]

@@ -2,11 +2,22 @@
 members = ["training", "interactive", "shared"]
 resolver = "2"
 
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+authors = ["Erik Engelhardt <https://github.com/DenominatorIsZero>"]
+license = "MIT"
+repository = "https://github.com/DenominatorIsZero/example_project"
+homepage = "https://github.com/DenominatorIsZero/example_project"
+documentation = "https://github.com/DenominatorIsZero/example_project#readme"
+keywords = ["ai", "machine-learning", "bevy", "wasm", "template", "candle"]
+categories = ["science", "web-programming", "webassembly", "template-engine", "visualization"]
+
 [workspace.dependencies]
 candle-core = "0.9"
 candle-nn = "0.9"
 anyhow = "1.0.99"
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1.0.207", features = ["derive"] }
 
 # Size-optimized release profile for WASM builds
 [profile.release]

@@ -28,8 +28,8 @@ fn generate_training_data(size: usize, seed: Option<u64>) -> Result<(Tensor, Ten
     let mut targets = Vec::with_capacity(size);
 
     for _ in 0..size {
-        let input1: f32 = rng.gen_range(-1.0..=1.0);
-        let input2: f32 = rng.gen_range(-1.0..=1.0);
+        let input1: f32 = rng.random_range(-1.0..=1.0);
+        let input2: f32 = rng.random_range(-1.0..=1.0);
 
         // Simple synthetic target function: (input1 + input2).tanh() * 0.5 + 0.5
         // This maps any sum to [0, 1] range
